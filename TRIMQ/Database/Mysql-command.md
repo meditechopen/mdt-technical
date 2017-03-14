@@ -1,9 +1,9 @@
 #Một số câu lệnh làm việc với MySQL
 
 # Mục lục
-[1. Các câu lệnh làm việc với Database](#1)
-[2. Các câu lệnh làm việc với table trong Database](#2)
-[3. Các câu lệnh làm việc với hàng và cột](#3)
+- [1. Các câu lệnh làm việc với Database](#1)
+- [2. Các câu lệnh làm việc với table trong Database](#2)
+- [3. Các câu lệnh làm việc với hàng và cột](#3)
 
 ## Đăng nhập vào MySQL: mysql -u root -p
 
