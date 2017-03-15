@@ -121,7 +121,7 @@ Thay thế enoXXX với tên NIC chưa có file cấu hình. Kiểm tra lại xe
 	ONBOOT=yes
 	IPADDR=192.168.11.10
 	NETMASK=255.255.255.0
-	BONDING_OPTS="mode=5 miimon=100"
+	BONDING_OPTS="mode=1 miimon=100"
 	EOF
 	```
 	
@@ -161,7 +161,7 @@ Thay thế enoXXX với tên NIC chưa có file cấu hình. Kiểm tra lại xe
 	nmcli con reload
 	systemctl restart network
 	```
-	-	Kiểm tra với câu lệnh `ip a` sẽ thấy `bond0` đã có địa chỉ IP và stata `UP`
+	-	Kiểm tra với câu lệnh `ip a` sẽ thấy `bond0` đã có địa chỉ IP và state `UP`
 	
 ### 2.3. Cấu hình bond1
  -	Bước 1 : Tạo bond1 cho 2 interface eno50332184 & eno67109408
@@ -173,9 +173,11 @@ Thay thế enoXXX với tên NIC chưa có file cấu hình. Kiểm tra lại xe
 	BONDING_MASTER=yes
 	BOOTPROTO=none
 	ONBOOT=yes
-	IPADDR=192.168.11.10
+	IPADDR=172.16.69.10
 	NETMASK=255.255.255.0
-	BONDING_OPTS="mode=5 miimon=100"
+	GATEWAY=172.16.69.1
+	DNS=8.8.8.8
+	BONDING_OPTS="mode=1 miimon=100"
 	EOF
 	```
 	
@@ -215,7 +217,7 @@ Thay thế enoXXX với tên NIC chưa có file cấu hình. Kiểm tra lại xe
 	nmcli con reload
 	systemctl restart network
 	```
-	-	Kiểm tra với câu lệnh `ip a` sẽ thấy `bond1` đã có địa chỉ IP và stata `UP`. Kiểm tra thông tin các bond với câu lệnh `cat /proc/net/bonding/bond0`, kết quả như sau :
+	-	Kiểm tra với câu lệnh `ip a` sẽ thấy `bond1` đã có địa chỉ IP và state `UP`. Kiểm tra thông tin các bond với câu lệnh `cat /proc/net/bonding/bond0`, kết quả như sau :
 	
 	```sh
 	Ethernet Channel Bonding Driver: v3.7.1 (April 27, 2011)
