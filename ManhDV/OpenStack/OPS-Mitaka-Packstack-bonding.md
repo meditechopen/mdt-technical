@@ -126,19 +126,20 @@ Thay thế enoXXX với tên NIC chưa có file cấu hình. Kiểm tra lại xe
 	```
 	
 	-	Bước 2 : Sửa file cấu hình các interface thuộc bond0
+	 -	Sao lưu file cấu hình interface eno16777728
 	
 	```sh
 	cp /etc/sysconfig/network-scripts/ifcfg-eno16777728 /etc/sysconfig/network-scripts/ifcfg-eno16777728.orig
 	```
 	
-		-	Sửa dòng với giá trị mới nếu đã có dòng đó và thêm các dòng nếu thiếu trong file /etc/sysconfig/network-scripts/ifcfg-eno16777728
+Sửa dòng với giá trị mới nếu đã có dòng đó và thêm các dòng nếu thiếu trong file /etc/sysconfig/network-scripts/ifcfg-eno16777728
 		
-		```sh
-		BOOTPROTO=none
-		ONBOOT=yes
-		MASTER=bond0
-		SLAVE=yes
-		```
+	```sh
+	BOOTPROTO=none
+	ONBOOT=yes
+	MASTER=bond0
+	SLAVE=yes
+	```
 		
 Sao lưu file cấu hình của interface eno33554952
 
