@@ -9,12 +9,12 @@
 
 ## IP Planing
 
-![ops](/ManhDV/OpenStack/images/ip-plan.png)
+![ops](/ManhDV/OpenStack/images/ipplan.png)
 
 ## Các bước chuẩn bị trên Controller
  -	Kiểm tra thiết lập card mạng 
  
-![ops](/ManhDV/OpenStack/images/carvm.png) 
+![ops](/ManhDV/OpenStack/images/cardvm.png) 
 
 Dùng 4 card mạng, chia thành 2 cặp, NIC1 và NIC2 chọn VMnet1 (Host-only), NIC3 và NIC4 chọn VMnet8 (NAT).
 
@@ -130,6 +130,7 @@ Thay thế enoXXX với tên NIC chưa có file cấu hình. Kiểm tra lại xe
 	```sh
 	cp /etc/sysconfig/network-scripts/ifcfg-eno16777728 /etc/sysconfig/network-scripts/ifcfg-eno16777728.orig
 	```
+	
 		-	Sửa dòng với giá trị mới nếu đã có dòng đó và thêm các dòng nếu thiếu trong file /etc/sysconfig/network-scripts/ifcfg-eno16777728
 		
 		```sh
