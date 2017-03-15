@@ -48,9 +48,9 @@ Trong quá trình cài đặt OS, nếu không bật chế độ **Connected** c
 
 Khi cài đặt OS, tôi đã chọn chế độ **Connected** cho cả 4 NIC, vì vậy có đủ 4 file cấu hình cho 4 NIC. Nếu chưa chọn chế độ **Connected**, thực hiện lệnh tạo file cấu hình còn thiếu cho các NIC.
 
-	```sh
-	nmcli device connect enoXXX
-	```
+```sh
+nmcli device connect enoXXX
+```
 	
 Thay thế enoXXX với tên NIC chưa có file cấu hình. Kiểm tra lại xem file cấu hình đã sinh. 
 
