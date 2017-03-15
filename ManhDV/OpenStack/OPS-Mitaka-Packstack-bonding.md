@@ -1,20 +1,20 @@
-#Hướng dẫn cài đặt Openstack Mitaka bằng packstack với mô hình Network Bonding
+# Hướng dẫn cài đặt Openstack Mitaka bằng packstack với mô hình Network Bonding
 
-##Chuẩn bị
+## Chuẩn bị
  -	Distro : RHEL 7 đã register
 
-##Mô hình
+## Mô hình
 
-![ops](/images/OPS-system.png)
+![ops](/ManhDV/OpenStack/images/OPS-system.png)
 
-##IP Planing
+## IP Planing
 
-![ops](/images/ip-plan.png)
+![ops](/ManhDV/OpenStack/images/ip-plan.png)
 
-##Các bước chuẩn bị trên Controller
+## Các bước chuẩn bị trên Controller
  -	Kiểm tra thiết lập card mạng 
  
-![ops](/images/carvm.png) 
+![ops](/ManhDV/OpenStack/images/carvm.png) 
 
 Dùng 4 card mạng, chia thành 2 cặp, NIC1 và NIC2 chọn VMnet1 (Host-only), NIC3 và NIC4 chọn VMnet8 (NAT).
 
@@ -26,8 +26,8 @@ Dùng 4 card mạng, chia thành 2 cặp, NIC1 và NIC2 chọn VMnet1 (Host-only
 	 hostnamectl set-hostname controller
 	```
 	
-###Tạo bonding 
-####Kiểm tra trạng thái card mạng
+### Tạo bonding 
+#### Kiểm tra trạng thái card mạng
  
 Trong quá trình cài đặt OS, nếu không bật chế độ **Connected** cho các NIC, thì các file cấu hình sẽ không tự sinh ra, mà ta phải tạo file cấu hình cho các NIC bằng lệnh. Trước tiên, kiểm tra trạng thái của các NIC và xem các NIC đã có file cấu hình hay chưa.
 
@@ -36,14 +36,14 @@ Trong quá trình cài đặt OS, nếu không bật chế độ **Connected** c
 	```sh
 	ls -alh /etc/sysconfig/network-scripts/
 	```
-![ops](/images/nic-fileconfig.png)  
+![ops](/ManhDV/OpenStack/images/nic-fileconfig.png)  
  
  -	Kiểm tra trạng thái các NIC
  
 	```sh
 	nmcli device status
 	```
-![ops](/images/nic-status.png) 
+![ops](/ManhDV/OpenStack/images/nic-status.png) 
 
 Khi cài đặt OS, tôi đã chọn chế độ **Connected** cho cả 4 NIC, vì vậy có đủ 4 file cấu hình cho 4 NIC. Nếu chưa chọn chế độ **Connected**, thực hiện lệnh tạo file cấu hình còn thiếu cho các NIC.
 
@@ -52,7 +52,7 @@ Khi cài đặt OS, tôi đã chọn chế độ **Connected** cho cả 4 NIC, v
 	```
 Thay thế enoXXX với tên NIC chưa có file cấu hình. Kiểm tra lại xem file cấu hình đã sinh. 
 
-####Tạo các card bond
+#### Tạo các card bond
 
  -	Phân bố các NIC
 	-	bond0 : eno16777736 & eno33554960, sử dụng VMnet1
@@ -131,6 +131,7 @@ Thay thế enoXXX với tên NIC chưa có file cấu hình. Kiểm tra lại xe
 	cp /etc/sysconfig/network-scripts/ifcfg-eno16777728 /etc/sysconfig/network-scripts/ifcfg-eno16777728.orig
 	```
 		-	Sửa dòng với giá trị mới nếu đã có dòng đó và thêm các dòng nếu thiếu trong file /etc/sysconfig/network-scripts/ifcfg-eno16777728
+		
 		```sh
 		BOOTPROTO=none
 		ONBOOT=yes
