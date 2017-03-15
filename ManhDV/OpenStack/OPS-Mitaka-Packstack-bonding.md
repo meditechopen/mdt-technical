@@ -39,7 +39,7 @@ Trong quá trình cài đặt OS, nếu không bật chế độ **Connected** c
 ![ops](/ManhDV/OpenStack/images/nic-fileconfig.png)  
  
  -	Kiểm tra trạng thái các NIC
- 
+
 	```sh
 	nmcli device status
 	```
