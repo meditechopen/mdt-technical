@@ -109,8 +109,8 @@ Thay thế enoXXX với tên NIC chưa có file cấu hình. Kiểm tra lại xe
 	parm:           packets_per_slave:Packets to send per slave in balance-rr mode; 0 for a random slave, 1 packet per slave (default), >1 packets per slave. (int)
 	parm:           lp_interval:The number of seconds between instances where the bonding driver sends learning packets to each slaves peer switch. The default is 1. (uint)
 	```
- -	Cấu hình bond0
-	-	Bước 1 : Tạo bond0 cho 2 interface eno16777736 & eno33554960
+#### Cấu hình bond0
+ -	Bước 1 : Tạo bond0 cho 2 interface eno16777736 & eno33554960
 	```sh
 	cat << EOF> /etc/sysconfig/network-scripts/ifcfg-bond0
 	DEVICE=bond0
@@ -125,14 +125,14 @@ Thay thế enoXXX với tên NIC chưa có file cấu hình. Kiểm tra lại xe
 	EOF
 	```
 	
-	-	Bước 2 : Sửa file cấu hình các interface thuộc bond0
-	 -	Sao lưu file cấu hình interface eno16777728
+ -	Bước 2 : Sửa file cấu hình các interface thuộc bond0
+	-	Sao lưu file cấu hình interface eno16777728
 	
 	```sh
 	cp /etc/sysconfig/network-scripts/ifcfg-eno16777728 /etc/sysconfig/network-scripts/ifcfg-eno16777728.orig
 	```
 	
-Sửa dòng với giá trị mới nếu đã có dòng đó và thêm các dòng nếu thiếu trong file /etc/sysconfig/network-scripts/ifcfg-eno16777728
+	-	Sửa dòng với giá trị mới nếu đã có dòng đó và thêm các dòng nếu thiếu trong file /etc/sysconfig/network-scripts/ifcfg-eno16777728
 		
 	```sh
 	BOOTPROTO=none
@@ -141,9 +141,11 @@ Sửa dòng với giá trị mới nếu đã có dòng đó và thêm các dòn
 	SLAVE=yes
 	```
 		
-Sao lưu file cấu hình của interface eno33554952
-
- cp /etc/sysconfig/network-scripts/ifcfg-eno33554952 /etc/sysconfig/network-scripts/ifcfg-eno33554952.orig
+	-	Sao lưu file cấu hình của interface eno33554952
+	```sh
+	cp /etc/sysconfig/network-scripts/ifcfg-eno33554952 /etc/sysconfig/network-scripts/ifcfg-eno33554952.orig
+	```
+	
 Sửa dòng với giá trị mới nếu đã có dòng đó và thêm các dòng nếu thiếu trong file /etc/sysconfig/network-scripts/ifcfg-eno33554952
 
  BOOTPROTO=none
