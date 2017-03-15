@@ -14,7 +14,7 @@
 
 ## 2. Cài đặt và cấu hình Bonding (Thực hiện trên 2 node CTL và COM)
 
-###2.1. Kiểm tra mô hình bonding
+### 2.1. Kiểm tra mô hình bonding
  
 ![ops](/ManhDV/OpenStack/images/cardvm.png) 
 
@@ -106,7 +106,7 @@ Thay thế enoXXX với tên NIC chưa có file cấu hình. Kiểm tra lại xe
 	parm:           lp_interval:The number of seconds between instances where the bonding driver sends learning packets to each slaves peer switch. The default is 1. (uint)
 	```
 	
-###2.2. Cấu hình bond0
+### 2.2. Cấu hình bond0
  -	Bước 1 : Tạo bond0 cho 2 interface eno16777736 & eno33554960
 	```sh
 	cat << EOF> /etc/sysconfig/network-scripts/ifcfg-bond0
@@ -160,7 +160,7 @@ Thay thế enoXXX với tên NIC chưa có file cấu hình. Kiểm tra lại xe
 	```
 	-	Kiểm tra với câu lệnh `ip a` sẽ thấy `bond0` đã có địa chỉ IP và stata `UP`
 	
-###2.3. Cấu hình bond1
+### 2.3. Cấu hình bond1
  -	Bước 1 : Tạo bond1 cho 2 interface eno50332184 & eno67109408
 	```sh
 	cat << EOF> /etc/sysconfig/network-scripts/ifcfg-bond1
@@ -249,7 +249,7 @@ Thay thế enoXXX với tên NIC chưa có file cấu hình. Kiểm tra lại xe
 	
 	-	Kết quả cuối cùng, 2 máy CTL và COM phải có 2 card bond0 và bond1 với cấu hình network như trên IP Plan.
 	
-##3. Cài đặt Packstack trên node CTL
+## 3. Cài đặt Packstack trên node CTL
 
  -	Tắt firewall, NetworkManager và disable Selinux
 
@@ -379,7 +379,7 @@ Thay thế enoXXX với tên NIC chưa có file cấu hình. Kiểm tra lại xe
 	systemctl restart openstack-nova-conductor.service openstack-nova-novncproxy.service
 	```
  -	Sau khi thực hiện chỉnh sửa `nova.conf` trên cả CTL và COM, vào dashboard và tạo máy ảo.
-##4. Cài đặt packstack trên COM
+## 4. Cài đặt packstack trên COM
 
  -	Tắt firewall, NetworkManager và disable Selinux
 
