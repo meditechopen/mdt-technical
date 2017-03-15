@@ -35,6 +35,7 @@ Trong quá trình cài đặt OS, nếu không bật chế độ **Connected** c
 	```sh
 	ls -alh /etc/sysconfig/network-scripts/
 	```
+	
 ![ops](/ManhDV/OpenStack/images/nic-fileconfig.png)  
  
  -	Kiểm tra trạng thái các NIC
@@ -42,6 +43,7 @@ Trong quá trình cài đặt OS, nếu không bật chế độ **Connected** c
 	```sh
 	nmcli device status
 	```
+	
 ![ops](/ManhDV/OpenStack/images/nic-status.png) 
 
 Khi cài đặt OS, tôi đã chọn chế độ **Connected** cho cả 4 NIC, vì vậy có đủ 4 file cấu hình cho 4 NIC. Nếu chưa chọn chế độ **Connected**, thực hiện lệnh tạo file cấu hình còn thiếu cho các NIC.
