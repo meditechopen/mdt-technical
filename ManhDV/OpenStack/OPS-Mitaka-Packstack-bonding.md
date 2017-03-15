@@ -49,6 +49,7 @@ Khi cài đặt OS, tôi đã chọn chế độ **Connected** cho cả 4 NIC, v
 	```sh
 	nmcli device connect enoXXX
 	```
+	
 Thay thế enoXXX với tên NIC chưa có file cấu hình. Kiểm tra lại xem file cấu hình đã sinh. 
 
  - Các bước cấu hình
