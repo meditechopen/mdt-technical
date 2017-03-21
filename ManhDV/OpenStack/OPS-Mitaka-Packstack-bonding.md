@@ -10,7 +10,7 @@
 
  -	IP Planing
 
-![ops](/ManhDV/OpenStack/images/ipplan.png)
+![ops](/ManhDV/OpenStack/images/ipplan-02.png)
 
 ## 2. Cài đặt và cấu hình Bonding (Thực hiện trên 2 node CTL và COM)
 
@@ -265,7 +265,7 @@ Thay thế enoXXX với tên NIC chưa có file cấu hình. Kiểm tra lại xe
 	systemctl stop NetworkManager
 	systemctl enable network
 	systemctl start network
-	sed -i 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/sysconfig/selinux
+	sed -i 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/selinux/config
 	```
 
  -	Reboot lại máy CTL
@@ -395,7 +395,7 @@ Thay thế enoXXX với tên NIC chưa có file cấu hình. Kiểm tra lại xe
 	systemctl stop NetworkManager
 	systemctl enable network
 	systemctl start network
-	sed -i 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/sysconfig/selinux
+	sed -i 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/selinux/config
 	```
 
  -	Reboot lại máy CTL
