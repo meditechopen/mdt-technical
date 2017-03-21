@@ -1,4 +1,4 @@
-#Hướng dẫn cài đặt OpenStack trên Mitaka với mô hình Openvswitch
+# Hướng dẫn cài đặt OpenStack trên Mitaka với mô hình Openvswitch
 
 # 1. Chuẩn bị
 
@@ -46,9 +46,11 @@ sysctl -p
 
  - Đăng ký tài khoản RHEL (Người dùng đã phải đăng ký bằng mail trên website của RHEL)
  
-`subscription-manager register --username="user" --password="userpassword" --auto-attach`
+```sh
+subscription-manager register --username="user" --password="userpassword" --auto-attach`
 
-`subscription-manager repos --enable=rhel-7-server-optional-rpms --enable=rhel-7-server-extras-rpms --enable=rhel-7-server-rh-common-rpms`
+subscription-manager repos --enable=rhel-7-server-optional-rpms --enable=rhel-7-server-extras-rpms --enable=rhel-7-server-rh-common-rpms
+```
 
  - Tắt firewall và selinux
 ```sh
@@ -264,7 +266,7 @@ su -s /bin/sh -c "keystone-manage db_sync" keystone
 
  - Chỉnh sửa file /etc/httpd/conf/httpd.conf
  
-`echo 'ServerName 172.16.69.10' >> /etc/httpd/conf/httpd.conf
+`echo 'ServerName 172.16.69.10' >> /etc/httpd/conf/httpd.conf`
 
  - Tạo file /etc/httpd/conf.d/wsgi-keystone.conf 
  
@@ -847,7 +849,7 @@ TYPE=OVSPort
 OVS_BRIDGE=br-provider
 ONBOOT=yes
 BOOTPROTO=none
-``
+```
 
  - Tạo file cấu hình /etc/sysconfig/network-scripts/ifcfg-br-provider mới
 
