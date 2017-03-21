@@ -68,9 +68,9 @@ sed -i 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/selinux/config
 
 `yum upgrade -y`
 
- - Cài đặt byobu
+ - Cài đặt byobu và wget 
  
-`yum install -y http://dl.fedoraproject.org/pub/epel/7/x86_64/b/byobu-5.73-4.el7.noarch.rpm`
+`yum install -y http://dl.fedoraproject.org/pub/epel/7/x86_64/b/byobu-5.73-4.el7.noarch.rpm wget`
 
  - Cài đặt openstack-client để sử dụng các câu lệnh openstack
  
@@ -114,7 +114,7 @@ systemctl start chronyd.service
 `chronyc sources`
 
 # 3. Cài đặt trên node Controller
-##3.1 Cài đặt và cấu hình database MySQL
+## 3.1 Cài đặt và cấu hình database MySQL
 
  - Cài đặt database MySQL
 
@@ -135,7 +135,7 @@ collation-server = utf8_general_ci
 character-set-server = utf8
 ```
 
- - Start dịch vụ và cho phép khởi động dịch vụ khi khởi động máy.
+ - Start dịch vụ và cho phép khởi động dịch vụ cùng hệ thống
  
 ```sh
 systemctl enable mariadb.service
@@ -147,7 +147,7 @@ systemctl start mariadb.service
 `mysql_secure_installation`
 
 ```sh
-Enter current password for root (enter for none): [your password]
+Enter current password for root (enter for none): Welcome123
 Change the root password? [Y/n]: n
 Remove anonymous users? [Y/n]: y
 Disallow root login remotely? [Y/n]: y
@@ -161,7 +161,7 @@ Reload privilege tables now? [Y/n]: y
  
 `yum install rabbitmq-server -y `
 
- - Start dịch vụ và cho phép khởi động dịch vụ khi khởi động máy
+ - Start dịch vụ và cho phép khởi động dịch vụ cùng hệ thống
  
 ```sh
 systemctl enable rabbitmq-server.service
@@ -197,16 +197,796 @@ MAXCONN="1024"
 CACHESIZE="64"
 OPTIONS="-l 0.0.0.0,::1"
 ```
- - Start dịch vụ và cho phép khởi động dịch vụ khi khởi động máy
+ - Start dịch vụ và cho phép khởi động dịch vụ cùng hệ thống
  
 ```sh
 systemctl enable memcached.service
 systemctl start memcached.service
 ```
 
+## 3.4 Cài đặt và cấu hình Keystone
 
-
+ - Tạo database cho keystone
  
+```sh
+mysql -u root -pWelcome123
+CREATE DATABASE keystone;
+GRANT ALL PRIVILEGES ON keystone.* TO 'keystone'@'localhost' IDENTIFIED BY 'Welcome123';
+GRANT ALL PRIVILEGES ON keystone.* TO 'keystone'@'%' IDENTIFIED BY 'Welcome123';
+FLUSH PRIVILEGES;
+exit
+```
 
+ - Tạo token 
+ 
+`openssl rand -hex 10`
+
+```sh
+e27814f52b002f1e813d
+```
+
+ - Cài đặt keystone
+ 
+`yum install -y openstack-keystone httpd mod_wsgi`
+
+ - Sao lưu file cấu hình keystone
+ 
+`cp /etc/keystone/keystone.conf /etc/keystone/keystone.conf.bka`
+
+ - Chỉnh sửa file cấu hình keystone
+ 
+`vi /etc/keystone/keystone.conf`
+
+```sh
+[DEFAULT]
+
+admin_token = e27814f52b002f1e813d
+
+[database]
+
+connection = mysql+pymysql://keystone:Welcome123@172.16.69.10/keystone
+
+[token]
+
+provider = fernet
+```
+
+ - Tạo fernet key
+ 
+`keystone-manage fernet_setup --keystone-user keystone --keystone-group keystone`
+
+ - Phân quyền thư mục log và đồng bộ databse keystone
+ 
+```sh
+chown keystone:keystone /var/log/keystone/keystone.log
+su -s /bin/sh -c "keystone-manage db_sync" keystone
+```
+
+ - Chỉnh sửa file /etc/httpd/conf/httpd.conf
+ 
+`echo 'ServerName 172.16.69.10' >> /etc/httpd/conf/httpd.conf
+
+ - Tạo file /etc/httpd/conf.d/wsgi-keystone.conf 
+ 
+`vi /etc/httpd/conf.d/wsgi-keystone.conf`
+
+```sh
+Listen 5000
+Listen 35357
+
+<VirtualHost *:5000>
+    WSGIDaemonProcess keystone-public processes=5 threads=1 user=keystone group=keystone display-name=%{GROUP}
+    WSGIProcessGroup keystone-public
+    WSGIScriptAlias / /usr/bin/keystone-wsgi-public
+    WSGIApplicationGroup %{GLOBAL}
+    WSGIPassAuthorization On
+    ErrorLogFormat "%{cu}t %M"
+    ErrorLog /var/log/httpd/keystone-error.log
+    CustomLog /var/log/httpd/keystone-access.log combined
+
+    <Directory /usr/bin>
+        Require all granted
+    </Directory>
+</VirtualHost>
+
+<VirtualHost *:35357>
+    WSGIDaemonProcess keystone-admin processes=5 threads=1 user=keystone group=keystone display-name=%{GROUP}
+    WSGIProcessGroup keystone-admin
+    WSGIScriptAlias / /usr/bin/keystone-wsgi-admin
+    WSGIApplicationGroup %{GLOBAL}
+    WSGIPassAuthorization On
+    ErrorLogFormat "%{cu}t %M"
+    ErrorLog /var/log/httpd/keystone-error.log
+    CustomLog /var/log/httpd/keystone-access.log combined
+
+    <Directory /usr/bin>
+        Require all granted
+    </Directory>
+</VirtualHost>
+```
+
+ - Restart dịch vụ và cho phép khởi động dịch vụ cùng hệ thống
+ 
+```sh
+systemctl enable httpd.service
+systemctl restart httpd.service
+```
+
+ - Export các thông tin keystone
+ 
+```sh
+export OS_TOKEN=e27814f52b002f1e813d
+export OS_URL=http://172.16.69.10:35357/v3
+export OS_IDENTITY_API_VERSION=3
+```
+
+ - Tạo service entity cho keystone
+ 
+`openstack service create --name keystone --description "OpenStack Identity" identity`
+
+ - Tạo API endpoints cho keystone
+ 
+```sh
+openstack endpoint create --region RegionOne identity public http://172.16.69.10:5000/v3
   
+openstack endpoint create --region RegionOne identity internal http://172.16.69.10:5000/v3
   
+openstack endpoint create --region RegionOne identity admin http://172.16.69.10:35357/v3
+```
+
+ - Tạo domain default
+ 
+`openstack domain create --description "Default Domain" default`
+
+ - Tạo admin project
+ 
+`openstack project create --domain default --description "Admin Project" admin`
+
+ - Tạo user admin, nhập password là `Welcome123`
+ 
+`openstack user create admin --domain default --password Welcome123`
+
+ - Sao lưu file /etc/keystone/keystone-paste.ini
+ 
+`cp /etc/keystone/keystone-paste.ini /etc/keystone/keystone-paste.ini.bka`
+
+ - Xóa các `admin_token_auth` khỏi các section sau :
+ 
+```sh
+[pipeline:public_api]
+
+[pipeline:admin_api]
+
+[pipeline:api_v3]
+```
+
+ - Unset biến 
+ 
+`unset OS_TOKEN OS_URL`
+
+ - Tạo user admin và demo, password là `Welcome123`
+ 
+```sh
+openstack --os-auth-url http://172.16.69.10:35357/v3 \
+  --os-project-domain-name default --os-user-domain-name default \
+  --os-project-name admin --os-username admin token issue
+  
+openstack --os-auth-url http://172.16.69.10:5000/v3 \
+  --os-project-domain-name default --os-user-domain-name default \
+  --os-project-name demo --os-username demo token issue  
+```
+
+Tạo các file source script admin-rc và demo-rc
+
+`vi admin-rc`
+
+```sh
+export OS_PROJECT_DOMAIN_NAME=default
+export OS_USER_DOMAIN_NAME=default
+export OS_PROJECT_NAME=admin
+export OS_USERNAME=admin
+export OS_PASSWORD=Welcome123
+export OS_AUTH_URL=http://172.16.69.10:35357/v3
+export OS_IDENTITY_API_VERSION=3
+export OS_IMAGE_API_VERSION=2
+```
+
+`vi demo-rc`
+
+```sh
+export OS_PROJECT_DOMAIN_NAME=default
+export OS_USER_DOMAIN_NAME=default
+export OS_PROJECT_NAME=demo
+export OS_USERNAME=demo
+export OS_PASSWORD=Welcome123
+export OS_AUTH_URL=http://172.16.69.10:5000/v3
+export OS_IDENTITY_API_VERSION=3
+export OS_IMAGE_API_VERSION=2
+```
+
+ - Kiểm tra script
+ 
+`. admin-rc`
+
+`openstack token issue`
+
+## 3.5. Cài đặt và cấu hình Glance
+
+ - Tạo database cho Glance
+ 
+```sh
+mysql -u root -pWelcome123
+CREATE DATABASE glance;
+GRANT ALL PRIVILEGES ON glance.* TO 'glance'@'localhost' IDENTIFIED BY 'Welcome123';
+GRANT ALL PRIVILEGES ON glance.* TO 'glance'@'%' IDENTIFIED BY 'Welcome123';
+FLUSH PRIVILEGES;
+exit
+```
+
+ - Tạo user glance
+
+```sh
+. admin-rc
+openstack user create glance --domain default --password Welcome123`
+```
+
+ - Gán quyền cho user glance và project service
+ 
+`openstack role add --project service --user glance admin`
+
+ - Tạo glance service entity
+ 
+`openstack service create --name glance --description "OpenStack Image" image`
+
+ - Tạo service API endpoints 
+ 
+```sh
+openstack endpoint create --region RegionOne image public http://172.16.69.10:9292
+
+openstack endpoint create --region RegionOne image internal http://172.16.69.10:9292
+
+openstack endpoint create --region RegionOne image admin http://172.16.69.10:9292
+```
+
+ - Cài đặt glance
+ 
+`yum install openstack-glance -y `
+
+ - Sao lưu file cấu hình glance-api.conf 
+ 
+`cp /etc/glance/glance-api.conf /etc/glance/glance-api.conf.bka`
+
+ - Sửa file cấu hình /etc/glance/glance-api.conf
+ 
+`vi /etc/glance/glance-api.conf`
+
+```sh
+[database]
+connection = mysql+pymysql://glance:Welcome123@172.16.69.10/glance
+
+[keystone_authtoken]
+auth_uri = http://172.16.69.10:5000
+auth_url = http://172.16.69.10:35357
+memcached_servers = 172.16.69.10:11211
+auth_type = password
+project_domain_name = default
+user_domain_name = default
+project_name = service
+username = glance
+password = Welcome123
+
+[paste_deploy]
+flavor = keystone
+
+[glance_store]
+stores = file,http
+default_store = file
+filesystem_store_datadir = /var/lib/glance/images/
+```
+
+ - Sao lưu file cấu hình /etc/glance/glance-registry.conf
+ 
+`cp /etc/glance/glance-registry.conf /etc/glance/glance-registry.conf.bka`
+
+ - Sửa file cấu hình /etc/glance/glance-registry.conf
+ 
+```sh
+[database]
+connection = mysql+pymysql://glance:Welcome123@172.16.69.10/glance
+
+[keystone_authtoken]
+auth_uri = http://172.16.69.10:5000
+auth_url = http://172.16.69.10:35357
+memcached_servers = 172.16.69.10:11211
+auth_type = password
+project_domain_name = default
+user_domain_name = default
+project_name = service
+username = glance
+password = Welcome123
+
+[paste_deploy]
+flavor = keystone
+```
+
+ - Đồng bộ glance database
+ 
+`su -s /bin/sh -c "glance-manage db_sync" glance`
+
+ - Start dịch vụ glance-api và glance-registry, cho phép khởi động dịch vụ cùng hệ thống
+ 
+```sh
+systemctl enable openstack-glance-api.service 
+systemctl enable openstack-glance-registry.service
+systemctl start openstack-glance-api.service 
+systemctl start openstack-glance-registry.service
+```
+
+ - Tải image cirros
+ 
+`wget http://download.cirros-cloud.net/0.3.4/cirros-0.3.4-x86_64-disk.img`
+
+ - Upload image cirros
+ 
+`. admin-rc`
+ 
+```sh
+openstack image create "cirros" \
+  --file cirros-0.3.4-x86_64-disk.img \
+  --disk-format qcow2 --container-format bare \
+  --public
+```
+
+ - Kiểm tra image đã upload
+ 
+`openstack image list `
+
+## 3.6 Cài đặt Nova
+
+ - Tạo database cho Nova
+ 
+```sh
+mysql -u root -pWelcome123
+
+CREATE DATABASE nova_api;
+CREATE DATABASE nova;
+
+GRANT ALL PRIVILEGES ON nova_api.* TO 'nova'@'localhost' IDENTIFIED BY 'Welcome123';
+GRANT ALL PRIVILEGES ON nova_api.* TO 'nova'@'%' IDENTIFIED BY 'Welcome123';
+GRANT ALL PRIVILEGES ON nova.* TO 'nova'@'localhost' IDENTIFIED BY 'Welcome123';
+GRANT ALL PRIVILEGES ON nova.* TO 'nova'@'%' IDENTIFIED BY 'Welcome123';
+FLUSH PRIVILEGES;
+exit 
+```
+
+ - Tạo user nova
+ 
+`. admin-rc`
+
+`openstack user  create nova --domain default --password Welcome123`
+
+ - Gán quyền admin cho user nova
+ 
+`openstack role add --project service --user nova admin`
+
+ - Tạo nova service entity
+ 
+`openstack service create --name nova --description "OpenStack Compute" compute`
+
+ - Tạo API endpoints cho Nova
+ 
+```sh
+openstack endpoint create --region RegionOne compute public http://172.16.69.10:8774/v2.1/%\(tenant_id\)s
+  
+openstack endpoint create --region RegionOne compute internal http://172.16.69.10:8774/v2.1/%\(tenant_id\)s
+
+openstack endpoint create --region RegionOne compute admin http://172.16.69.10:8774/v2.1/%\(tenant_id\)s
+```
+
+ - Cài đặt nova
+ 
+```sh
+yum install -y openstack-nova-api openstack-nova-conductor \
+  openstack-nova-console openstack-nova-novncproxy \
+  openstack-nova-scheduler
+```
+
+ - Sao lưu file cấu hình /etc/nova/nova.conf 
+ 
+`cp /etc/nova/nova.conf  /etc/nova/nova.conf.bka`
+
+ - Sửa file cấu hình /etc/nova/nova.conf 
+ 
+```sh
+[DEFAULT]
+my_ip = 172.16.69.10
+enabled_apis = osapi_compute,metadata
+rpc_backend = rabbit
+auth_strategy = keystone
+use_neutron = True
+firewall_driver = nova.virt.firewall.NoopFirewallDriver
+
+[api_database]
+connection = mysql+pymysql://nova:Welcome123@172.16.69.10/nova_api
+
+[database]
+connection = mysql+pymysql://nova:Welcome123@172.16.69.10/nova
+
+[oslo_messaging_rabbit]
+rabbit_host = 172.16.69.10
+rabbit_userid = openstack
+rabbit_password = Welcome123
+
+[keystone_authtoken]
+auth_uri = http://172.16.69.10:5000
+auth_url = http://172.16.69.10:35357
+memcached_servers = 172.16.69.10:11211
+auth_type = password
+project_domain_name = default
+user_domain_name = default
+project_name = service
+username = nova
+password = Welcome123
+
+[vnc]
+vncserver_listen = $my_ip
+vncserver_proxyclient_address = $my_ip
+
+[glance]
+api_servers = http://172.16.69.10:9292
+
+[oslo_concurrency]
+lock_path = /var/lib/nova/tmp
+```
+
+ - Đồng bộ database nova
+ 
+```sh
+su -s /bin/sh -c "nova-manage api_db sync" nova
+su -s /bin/sh -c "nova-manage db sync" nova
+```
+
+ - Start các service nova và cho phép khởi động dịch vụ cùng hệ thống
+ 
+```sh
+systemctl enable openstack-nova-api.service \
+  openstack-nova-consoleauth.service openstack-nova-scheduler.service \
+  openstack-nova-conductor.service openstack-nova-novncproxy.service
+
+systemctl start openstack-nova-api.service \
+  openstack-nova-consoleauth.service openstack-nova-scheduler.service \
+  openstack-nova-conductor.service openstack-nova-novncproxy.service  
+```
+
+## 3.7 Cài đặt Neutron (Theo dạng network OpenvSwitch)
+
+ - Tạo database cho neutron
+ 
+```sh
+mysql -u root -pWelcome123
+CREATE DATABASE neutron;
+GRANT ALL PRIVILEGES ON neutron.* TO 'neutron'@'localhost' IDENTIFIED BY 'Welcome123';
+GRANT ALL PRIVILEGES ON neutron.* TO 'neutron'@'%' IDENTIFIED BY 'Welcome123';
+FLUSH PRIVILEGES;
+exit
+```
+
+ - Tạo user neutron
+ 
+`openstack user create neutron --domain default --password Welcome123`
+
+ - Gán quyền admin cho user neutron
+ 
+`openstack role add --project service --user neutron admin`
+
+ - Tạo neutron service entity
+ 
+`openstack service create --name neutron --description "OpenStack Networking" network`
+
+ - Tạo API endpoints cho neutron
+ 
+```sh
+openstack endpoint create --region RegionOne network public http://172.16.69.10:9696
+
+openstack endpoint create --region RegionOne network internal http://172.16.69.10:9696
+
+openstack endpoint create --region RegionOne network admin http://172.16.69.10:9696
+```
+ 
+ - Cài đặt Neutron sử dụng openvSwitch
+ 
+`yum -y install openstack-neutron openstack-neutron-ml2  openstack-neutron-openvswitch ebtables`
+
+ - Sao lưu file cấu hình neutron
+ 
+`cp /etc/neutron/neutron.conf /etc/neutron/neutron.conf.bka`
+
+ - Sửa file cấu hình /etc/neutron/neutron.conf 
+ 
+```sh
+[DEFAULT]
+core_plugin = ml2
+service_plugins =
+rpc_backend = rabbit
+auth_strategy = keystone
+notify_nova_on_port_status_changes = True
+notify_nova_on_port_data_changes = True
+dhcp_agents_per_network = 2
+
+[database]
+connection = mysql+pymysql://neutron:Welcome123@172.16.69.10/neutron
+
+[oslo_messaging_rabbit]
+rabbit_host = 172.16.69.10
+rabbit_userid = openstack
+rabbit_password = Welcome123
+
+[keystone_authtoken]
+auth_uri = http://172.16.69.10:5000
+auth_url = http://172.16.69.10:35357
+memcached_servers = 172.16.69.10:11211
+auth_type = password
+project_domain_name = default
+user_domain_name = default
+project_name = service
+username = neutron
+password = Welcome123
+
+[nova]
+auth_url = http://172.16.69.10:35357
+auth_type = password
+project_domain_name = default
+user_domain_name = default
+region_name = RegionOne
+project_name = service
+username = nova
+password = Welcome123
+
+[oslo_concurrency]
+lock_path = /var/lib/neutron/tmp
+```
+
+ - Sao lưu file cấu hình /etc/neutron/plugins/ml2/ml2_conf.ini
+ 
+`cp /etc/neutron/plugins/ml2/ml2_conf.ini /etc/neutron/plugins/ml2/ml2_conf.ini.bka`
+
+ - Sửa file cấu hình /etc/neutron/plugins/ml2/ml2_conf.ini
+ 
+```sh
+[ml2]
+type_drivers = flat,vlan
+tenant_network_types =
+mechanism_drivers = openvswitch
+extension_drivers = port_security
+
+[ml2_type_flat]
+flat_networks = provider
+
+[ml2_type_vlan]
+network_vlan_ranges = provider
+
+[securitygroup]
+firewall_driver = neutron.agent.linux.iptables_firewall.OVSHybridIptablesFirewallDriver
+enable_security_group = True
+```
+
+ - Sao lưu file cấu hình /etc/neutron/dhcp_agent.ini
+ 
+`cp /etc/neutron/dhcp_agent.ini /etc/neutron/dhcp_agent.ini.bka`
+
+ - Sửa file cấu hình /etc/neutron/dhcp_agent.ini
+ 
+```sh
+[DEFAUL]
+verbose = True
+interface_driver = neutron.agent.linux.interface.OVSInterfaceDriver
+enable_isolated_metadata = True
+dhcp_driver = neutron.agent.linux.dhcp.Dnsmasq
+```
+
+ - Sao lưu file cấu hình /etc/neutron/metadata_agent.ini
+ 
+`cp /etc/neutron/metadata_agent.ini /etc/neutron/metadata_agent.ini.bka`
+
+ - Sửa file cấu hình /etc/neutron/metadata_agent.ini
+ 
+```sh
+[DEFAULT]
+nova_metadata_ip = 172.16.69.10
+metadata_proxy_shared_secret = Welcome123
+```
+
+ - Sao lưu file cấu hình /etc/neutron/plugins/ml2/openvswitch_agent.ini 
+ 
+`cp /etc/neutron/plugins/ml2/openvswitch_agent.ini /etc/neutron/plugins/ml2/openvswitch_agent.ini.bka`
+
+ - Sửa file cấu hình /etc/neutron/plugins/ml2/openvswitch_agent.ini
+ 
+```sh
+[ovs]
+bridge_mappings = provider:br-provider
+
+[securitygroup]
+firewall_driver = neutron.agent.linux.iptables_firewall.OVSHybridIptablesFirewallDriver
+enable_security_group = True
+```
+
+ - Khai báo cấu hình neutron trong file cấu hình /etc/nova/nova.conf
+ 
+```sh
+[neutron]
+url = http://172.16.69.10:9696
+auth_url = http://172.16.69.10:35357
+auth_type = password
+project_domain_name = default
+user_domain_name = default
+region_name = RegionOne
+project_name = service
+username = neutron
+password = Welcome123
+
+service_metadata_proxy = True
+metadata_proxy_shared_secret = Welcome123
+```
+ 
+ - Tạo OVS provider
+ 
+`ovs-vsctl add-br br-provider`
+
+ - Gán interface provider vào OVS provider
+ 
+`ovs-vsctl add-port br-provider eno33554960`
+
+ - Tạo file cấu hình /etc/sysconfig/network-scripts/ifcfg-eno33554960 mới
+ 
+```sh
+DEVICE=eno33554960
+NAME=eno33554960
+DEVICETYPE=ovs
+TYPE=OVSPort
+OVS_BRIDGE=br-provider
+ONBOOT=yes
+BOOTPROTO=none
+``
+
+ - Tạo file cấu hình /etc/sysconfig/network-scripts/ifcfg-br-provider mới
+
+```sh
+ONBOOT=yes
+IPADDR=10.16.150.202
+PREFIX=24
+DEVICE=br-provider
+NAME=br-provider
+DEVICETYPE=ovs
+OVSBOOTPROTO=none
+TYPE=OVSBridge
+```
+ - Restart network
+ 
+`systemctl restart network`
+
+ - Tạo symbolic link từ ml2_conf.ini tới neutron/plugin.ini 
+ 
+`ln -s /etc/neutron/plugins/ml2/ml2_conf.ini /etc/neutron/plugin.ini`
+
+
+ - Đồng bộ database neutron
+ 
+```sh
+su -s /bin/sh -c "neutron-db-manage --config-file /etc/neutron/neutron.conf \
+  --config-file /etc/neutron/plugins/ml2/ml2_conf.ini upgrade head" neutron
+```
+
+ - Restart dịch vụ nova
+ 
+`systemctl restart openstack-nova-api.service`
+
+ - Start các service neutron và cho phép khởi động dịch vụ cùng hệ thống
+ 
+```sh
+systemctl enable neutron-server.service 
+systemctl enable neutron-openvswitch-agent.service 
+systemctl enable neutron-dhcp-agent.service 
+systemctl enable neutron-metadata-agent.service
+
+systemctl start neutron-server.service 
+systemctl start neutron-openvswitch-agent.service 
+systemctl start neutron-dhcp-agent.service 
+systemctl start neutron-metadata-agent.service
+```
+
+ - Kiểm tra dịch vụ neutron
+ 
+`. admin-rc`
+
+`neutron agent-list`
+
+# 4. Cài đặt trên Compute
+
+## 4.1. Cài đặt và cấu hình Nova
+
+ - Cài đặt nova
+ 
+`yum install openstack-nova-compute -y`
+
+ - Sao lưu file cấu hình /etc/nova/nova.conf
+ 
+`cp /etc/nova/nova.conf /etc/nova/nova.conf.bka`
+
+ - Sửa file cấu hình /etc/nova/nova.conf
+ 
+```sh
+[DEFAULT]
+my_ip = 172.16.69.20
+rpc_backend = rabbit
+auth_strategy = keystone
+use_neutron = True
+firewall_driver = nova.virt.firewall.NoopFirewallDriver
+compute_driver=libvirt.LibvirtDriver
+
+[oslo_messaging_rabbit]
+rabbit_host = 172.16.69.10
+rabbit_userid = openstack
+rabbit_password = Welcome123
+
+[libvirt]
+virt_type=kvm
+cpu_mode=none
+
+[keystone_authtoken]
+auth_uri = http://172.16.69.10:5000
+auth_url = http://172.16.69.10:35357
+memcached_servers = 172.16.69.10:11211
+auth_type = password
+project_domain_name = default
+user_domain_name = default
+project_name = service
+username = nova
+password = Welcome123
+
+[vnc]
+enabled = True
+vncserver_listen = 0.0.0.0
+vncserver_proxyclient_address = $my_ip
+novncproxy_base_url = http://172.16.69.10:6080/vnc_auto.html
+
+[glance]
+api_servers = http://172.16.69.10:9292
+
+[oslo_concurrency]
+lock_path = /var/lib/nova/tmp
+```
+
+ - Đối với môi trường ảo hóa vmware, kiểm tra xem máy compute có hỗ trợ kvm không.
+ 
+`egrep -c '(vmx|svm)' /proc/cpuinfo`
+
+Nếu giá trị trả về = 0 thì sửa trong file /etc/nova/nova.conf 
+
+```sh
+[libvirt]
+virt_type = qemu
+```
+
+ - Start service nova và cho phép khởi động dịch vụ cùng hệ thống
+ 
+```sh
+systemctl enable libvirtd.service openstack-nova-compute.service
+systemctl start libvirtd.service openstack-nova-compute.service
+```
+
+ - Quay lại máy Controller, thực hiện kiểm tra nova
+ 
+`. admin-rc`
+
+`openstack compute service list`
+
+## 4.2. Cài đặt và cấu hình neutron openvSwitch
+
+ - Cài đặt neutron openvswitch
+ 
+`yum install -y openstack-neutron-openvswitch ebtables ipset`
+
+ - Sao lưu file cấu hình /etc/neutron/neutron.conf
+ 
+`cp /etc/neutron/neutron.conf /etc/neutron/neutron.conf.bka `
