@@ -456,7 +456,7 @@ exit
 
 ```sh
 . admin-rc
-openstack user create glance --domain default --password Welcome123`
+openstack user create glance --domain default --password Welcome123
 ```
 
  - Gán quyền cho user glance và project service
@@ -486,8 +486,6 @@ openstack endpoint create --region RegionOne image admin http://172.16.69.10:929
 `cp /etc/glance/glance-api.conf /etc/glance/glance-api.conf.bka`
 
  - Sửa file cấu hình /etc/glance/glance-api.conf
- 
-`vi /etc/glance/glance-api.conf`
 
 ```sh
 [database]
@@ -702,6 +700,8 @@ exit
 
  - Tạo user neutron
  
+`vi admin-rc`
+ 
 `openstack user create neutron --domain default --password Welcome123`
 
  - Gán quyền admin cho user neutron
@@ -866,6 +866,10 @@ metadata_proxy_shared_secret = Welcome123
  
 `ovs-vsctl add-port br-provider eno33554960`
 
+ - Sao lưu file cấu hình ifcfg-eno33554960
+ 
+`cp /etc/sysconfig/network-scripts/ifcfg-eno33554960 /etc/sysconfig/network-scripts/ifcfg-eno33554960.bka`
+
  - Tạo file cấu hình /etc/sysconfig/network-scripts/ifcfg-eno33554960 mới
  
 ```sh
@@ -882,8 +886,10 @@ BOOTPROTO=none
 
 ```sh
 ONBOOT=yes
-IPADDR=10.16.150.202
-PREFIX=24
+IPADDR=172.16.69.10
+NETMASK=255.255.255.0
+GATEWAY=172.16.69.1
+DNS=8.8.8.8
 DEVICE=br-provider
 NAME=br-provider
 DEVICETYPE=ovs
@@ -893,6 +899,13 @@ TYPE=OVSBridge
  - Restart network
  
 `systemctl restart network`
+
+ - Kiểm tra nếu IP trên card eno33554960 chưa mất, xóa IP bằng tay và restart network:
+ 
+```sh
+ip addr del 172.16.69.10/24 dev eno33554960
+systemctl restart network
+```
 
  - Tạo symbolic link từ ml2_conf.ini tới neutron/plugin.ini 
  
@@ -930,6 +943,8 @@ systemctl start neutron-metadata-agent.service
 
 `neutron agent-list`
 
+![ops](/ManhDV/OpenStack/images/neutron.png)
+
 ## 3.8 Cài đặt và cấu hìnhHorizon
 
  - Cài đặt horizon
@@ -940,7 +955,7 @@ systemctl start neutron-metadata-agent.service
  
 `cp /etc/openstack-dashboard/local_settings  /etc/openstack-dashboard/local_settings.bka`
 
- - Sửa fiel cấu hình /etc/openstack-dashboard/local_settings
+ - Sửa file cấu hình /etc/openstack-dashboard/local_settings
  
 ```sh
 OPENSTACK_HOST = "172.16.69.10"
@@ -966,7 +981,7 @@ OPENSTACK_API_VERSIONS = {
     "volume": 2,
 }
 
-ENSTACK_KEYSTONE_DEFAULT_DOMAIN = "default"
+OPENSTACK_KEYSTONE_DEFAULT_DOMAIN = "default"
 
 OPENSTACK_KEYSTONE_DEFAULT_ROLE = "user"
 
@@ -986,7 +1001,7 @@ OPENSTACK_NEUTRON_NETWORK = {
 
  - Restart dịch vụ
 
-systemctl restart httpd.service memcached.service 
+`systemctl restart httpd.service memcached.service`
 
 
 # 4. Cài đặt trên Compute
@@ -1157,6 +1172,10 @@ systemctl start neutron-openvswitch-agent.service
  
 `ovs-vsctl add-port br-provider eno33554960`
 
+ - Sao lưu file cấu hình ifcfg-eno33554960
+ 
+`cp /etc/sysconfig/network-scripts/ifcfg-eno33554960 /etc/sysconfig/network-scripts/ifcfg-eno33554960.bka`
+
  - Tạo file cấu hình /etc/sysconfig/network-scripts/ifcfg-eno33554960 mới
  
 ```sh
@@ -1173,8 +1192,10 @@ BOOTPROTO=none
 
 ```sh
 ONBOOT=yes
-IPADDR=10.16.150.202
-PREFIX=24
+IPADDR=172.16.69.20
+NETMASK=255.255.255.0
+GATEWAY=172.16.69.1
+DNS=8.8.8.8
 DEVICE=br-provider
 NAME=br-provider
 DEVICETYPE=ovs
@@ -1185,6 +1206,14 @@ TYPE=OVSBridge
  
 `systemctl restart network`
 
+ - Kiểm tra nếu IP trên card eno33554960 chưa mất, xóa IP bằng tay và restart network:
+ 
+```sh
+ip addr del 172.16.69.20/24 dev eno33554960
+systemctl restart network
+```
+cd
+,.
  - Restart dịch vụ OVS agent
  
 `systemctl restart neutron-openvswitch-agent.service`
