@@ -903,6 +903,65 @@ systemctl start neutron-metadata-agent.service
 
 `neutron agent-list`
 
+## 3.8 Cài đặt và cấu hìnhHorizon
+
+ - Cài đặt horizon
+
+`yum install openstack-dashboard -y`
+
+ - Sao lưu file cấu hình cho dashboard
+ 
+`cp /etc/openstack-dashboard/local_settings  /etc/openstack-dashboard/local_settings.bka`
+
+ - Sửa fiel cấu hình /etc/openstack-dashboard/local_settings
+ 
+```sh
+OPENSTACK_HOST = "172.16.69.10"
+
+ALLOWED_HOSTS = ['*', ]
+
+SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
+
+CACHES = {
+    'default': {
+         'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
+         'LOCATION': '172.16.69.10:11211',
+    }
+}
+
+OPENSTACK_KEYSTONE_URL = "http://%s:5000/v3" % OPENSTACK_HOST
+
+OPENSTACK_KEYSTONE_MULTIDOMAIN_SUPPORT = True
+
+OPENSTACK_API_VERSIONS = {
+    "identity": 3,
+    "image": 2,
+    "volume": 2,
+}
+
+ENSTACK_KEYSTONE_DEFAULT_DOMAIN = "default"
+
+OPENSTACK_KEYSTONE_DEFAULT_ROLE = "user"
+
+OPENSTACK_NEUTRON_NETWORK = {
+    ...
+    'enable_router': False,
+    'enable_quotas': False,
+    'enable_distributed_router': False,
+    'enable_ha_router': False,
+    'enable_lb': False,
+    'enable_firewall': False,
+    'enable_vpn': False,
+    'enable_fip_topology_check': False,
+}
+
+```
+
+ - Restart dịch vụ
+
+systemctl restart httpd.service memcached.service 
+
+
 # 4. Cài đặt trên Compute
 
 ## 4.1. Cài đặt và cấu hình Nova
@@ -992,3 +1051,119 @@ systemctl start libvirtd.service openstack-nova-compute.service
  - Sao lưu file cấu hình /etc/neutron/neutron.conf
  
 `cp /etc/neutron/neutron.conf /etc/neutron/neutron.conf.bka `
+
+ - Sửa file cấu hình /etc/neutron/neutron.conf 
+ 
+```sh
+[DEFAULT]
+rpc_backend = rabbit
+auth_strategy = keystone
+core_plugin = ml2 
+notify_nova_on_port_status_changes = true
+notify_nova_on_port_data_changes = true
+
+[oslo_messaging_rabbit]
+rabbit_host = 172.16.69.10
+rabbit_userid = openstack
+rabbit_password = Welcome123
+
+[keystone_authtoken]
+auth_uri = http://172.16.69.10:5000
+auth_url = http://172.16.69.10:35357
+memcached_servers = 172.16.69.10:11211
+auth_type = password
+project_domain_name = default
+user_domain_name = default
+project_name = service
+username = neutron
+password = Welcome123
+
+[oslo_concurrency]
+lock_path = /var/lib/neutron/tmp
+```
+
+ - Sao lưu file cấu hình openvswitch_agent.ini
+ 
+`cp /etc/neutron/plugins/ml2/openvswitch_agent.ini /etc/neutron/plugins/ml2/openvswitch_agent.ini.bka`
+
+ - Sửa file cấu hình openvswitch_agent.ini
+ 
+```sh
+[ovs]
+bridge_mappings = provider:br-provider
+
+[securitygroup]
+firewall_driver = neutron.agent.linux.iptables_firewall.OVSHybridIptablesFirewallDriver
+enable_security_group = True
+```
+
+ - Cấu hình neutron tròn file /etc/nova/nova.conf
+ 
+```sh
+[neutron]
+url = http://172.16.69.10:9696
+auth_url = http://172.16.69.10:35357
+auth_type = password
+project_domain_name = default
+user_domain_name = default
+region_name = RegionOne
+project_name = service
+username = neutron
+password = Welcome123 
+```
+ 
+ - Restart dịch vụ nova
+ 
+`systemctl restart openstack-nova-compute.service`
+
+ - Start neutron và cho phép khởi động dịch vụ trực tiếp cùng hệ thống.
+ 
+```sh
+systemctl enable neutron-openvswitch-agent.service
+systemctl start neutron-openvswitch-agent.service
+```
+ - Tạo OVS provider
+ 
+`ovs-vsctl add-br br-provider`
+
+ - Gán interface provider vào OVS provider
+ 
+`ovs-vsctl add-port br-provider eno33554960`
+
+ - Tạo file cấu hình /etc/sysconfig/network-scripts/ifcfg-eno33554960 mới
+ 
+```sh
+DEVICE=eno33554960
+NAME=eno33554960
+DEVICETYPE=ovs
+TYPE=OVSPort
+OVS_BRIDGE=br-provider
+ONBOOT=yes
+BOOTPROTO=none
+```
+
+ - Tạo file cấu hình /etc/sysconfig/network-scripts/ifcfg-br-provider mới
+
+```sh
+ONBOOT=yes
+IPADDR=10.16.150.202
+PREFIX=24
+DEVICE=br-provider
+NAME=br-provider
+DEVICETYPE=ovs
+OVSBOOTPROTO=none
+TYPE=OVSBridge
+```
+ - Restart network
+ 
+`systemctl restart network`
+
+ - Restart dịch vụ OVS agent
+ 
+`systemctl restart neutron-openvswitch-agent.service`
+
+ - Quay lại kiểm tra trên Controller
+ 
+`. admin-rc`
+
+`openstack network agent list`
