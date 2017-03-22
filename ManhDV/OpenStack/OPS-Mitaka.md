@@ -1223,3 +1223,39 @@ cd
 `. admin-rc`
 
 `openstack network agent list`
+
+# 5. Tạo máy ảo
+
+ - Tạo network public
+ 
+```sh
+neutron net-create external_network --provider:network_type flat \
+--provider:physical_network extnet  \
+--router:external \
+--shared
+```
+
+ - Tạo subnet trong network public
+ 
+```sh
+neutron subnet-create --name public_subnet \
+--enable_dhcp=True --dns-nameserver 8.8.4.4 \
+--allocation-pool=start=172.16.69.80,end=172.16.69.100 \
+--gateway=172.16.69.1 external_network 172.16.69.0/24
+```
+
+ - Tạo network private
+
+```sh
+neutron net-create private_network
+neutron subnet-create --name private_subnet private_network 10.0.0.0/24 \
+--dns-nameserver 8.8.8.8
+```
+
+ - Tạo router và addd các interface
+
+```sh
+neutron router-create router
+neutron router-gateway-set router external_network
+neutron router-interface-add router private_subnet
+```
