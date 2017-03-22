@@ -85,25 +85,22 @@ sed -i 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/selinux/config
 ## 2.1 Cài đặt và cấu hình dịch vụ đồng bộ thời gian NTP
 
  - Cài đặt NTP
+ 
 `yum install chrony -y `
 
  - Chỉnh sửa file cấu hình /etc/chrony/chrony.conf
  
 ```sh
-sed -i "s/server 0.debian.pool.ntp.org offline minpoll 8/ \
-server 172.16.69.10 iburst/g" /etc/chrony/chrony.conf
+sed -i "s/server 0.rhel.pool.ntp.org iburst/server 172.16.69.10 iburst/g" /etc/chrony.conf
 
-sed -i 's/server 1.debian.pool.ntp.org offline minpoll 8/ \
-# server 1.debian.pool.ntp.org offline minpoll 8/g' /etc/chrony/chrony.conf
+sed -i 's/server 1.rhel.pool.ntp.org iburst/#server 1.rhel.pool.ntp.org iburst/g' /etc/chrony.conf
 
-sed -i 's/server 2.debian.pool.ntp.org offline minpoll 8/ \
-# server 2.debian.pool.ntp.org offline minpoll 8/g' /etc/chrony/chrony.conf
+sed -i 's/server 2.rhel.pool.ntp.org iburst/#server 2.rhel.pool.ntp.org iburst/g' /etc/chrony.conf
 
-sed -i 's/server 3.debian.pool.ntp.org offline minpoll 8/ \
-# server 3.debian.pool.ntp.org offline minpoll 8/g' /etc/chrony/chrony.conf
+sed -i 's/server 3.rhel.pool.ntp.org iburst/#server 3.rhel.pool.ntp.org iburst/g' /etc/chrony.conf
 
-sed -i 's// \
- /g'/etc/chrony/chrony.conf 
+sed -i 's/#allow 192.168\/16/allow 172.16.69.0\/24/g' /etc/chrony.conf
+
 ```
  - Restart dịch vụ ntp
  
@@ -114,6 +111,8 @@ systemctl start chronyd.service
  - Chạy lệnh kiểm tra trên 2 node CTL và COM
  
 `chronyc sources`
+
+![ops](/ManhDV/OpenStack/images/ntp.png)
 
 # 3. Cài đặt trên node Controller
 ## 3.1 Cài đặt và cấu hình database MySQL
@@ -149,8 +148,11 @@ systemctl start mariadb.service
 `mysql_secure_installation`
 
 ```sh
-Enter current password for root (enter for none): Welcome123
-Change the root password? [Y/n]: n
+Enter current password for root (enter for none): [enter]
+Change the root password? [Y/n]: y
+Set root password? [Y/n] y
+New password:Welcome123
+Re-enter new password:Welcome123
 Remove anonymous users? [Y/n]: y
 Disallow root login remotely? [Y/n]: y
 Remove test database and access to it? [Y/n]: y
@@ -190,15 +192,8 @@ systemctl start rabbitmq-server.service
 
  - Chính sửa cấu hình memcache
  
-`vi /etc/sysconfig/memcached`
+`sed -i 's/OPTIONS=\"-l 127.0.0.1,::1\"/OPTIONS=\"-l 0.0.0.0,::1\"/g' /etc/sysconfig/memcached`
 
-```sh
-PORT="11211"
-USER="memcached"
-MAXCONN="1024"
-CACHESIZE="64"
-OPTIONS="-l 0.0.0.0,::1"
-```
  - Start dịch vụ và cho phép khởi động dịch vụ cùng hệ thống
  
 ```sh
@@ -219,9 +214,7 @@ FLUSH PRIVILEGES;
 exit
 ```
 
- - Tạo token 
- 
-`openssl rand -hex 10`
+ - Tạo token từ câu lệnh `openssl rand -hex 10`
 
 ```sh
 e27814f52b002f1e813d
@@ -347,6 +340,40 @@ openstack endpoint create --region RegionOne identity admin http://172.16.69.10:
  - Tạo user admin, nhập password là `Welcome123`
  
 `openstack user create admin --domain default --password Welcome123`
+
+ - Tạo role admin
+ 
+`openstack role create admin`
+
+ - Gán role admin và user và project admin
+ 
+`openstack role add --project admin --user admin admin`
+
+ - Tạo service project
+ 
+```sh
+openstack project create --domain default --description "Service Project" service
+```
+
+ - Tạo demo project
+ 
+```sh
+openstack project create --domain default --description "Demo Project" demo
+```
+
+ - Tạo user demo
+ 
+```sh
+openstack user create demo --domain default --password Welcome123
+```
+
+ - Tạo role demo
+ 
+`openstack role create user`
+
+ - Gán role demo vào project và user demo
+ 
+`openstack role add --project demo --user demo user`
 
  - Sao lưu file /etc/keystone/keystone-paste.ini
  
