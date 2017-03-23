@@ -1226,6 +1226,213 @@ cd
 
 `openstack network agent list`
 
+# 5. Cài đặt mô hình network Self-service
+
+
+ - Tắt 2 máy CTL và COM, sau đó add thêm card VMnet2 cho cả 2 máy. Xuất hiện card ens39 thuộc VMnet2.
+
+## 5.1. Thực hiện trên node Controller
+ - Sửa cấu hình file /etc/neutron/neutron.conf 
+ 
+```sh
+[DEFAULT]
+verbose = True
+core_plugin = ml2
+service_plugins = router
+allow_overlapping_ips = True
+```
+ 
+ - Sửa file cấu hình /etc/neutron/plugins/ml2/ml2_conf.ini
+ 
+```sh
+[ml2]
+type_drivers = flat,vlan,gre,vxlan
+tenant_network_types = vlan,gre,vxlan
+mechanism_drivers = openvswitch,l2population
+extension_drivers = port_security
+
+[ml2_type_flat]
+flat_networks = provider
+
+[ml2_type_vlan]
+network_vlan_ranges = provider,vlan:1:100
+
+[ml2_type_gre]
+tunnel_id_ranges = 1:100
+
+[ml2_type_vxlan]
+vni_ranges = 1:100
+
+[securitygroup]
+enable_ipset = True
+```
+
+ - Sửa file /etc/neutron/plugins/ml2/openvswitch_agent.ini
+ 
+```sh
+[ovs]
+local_ip = 192.168.11.10
+bridge_mappings = vlan:br-vlan,provider:br-provider
+
+[agent]
+tunnel_types = gre,vxlan
+l2_population = True
+prevent_arp_spoofing = True
+
+[securitygroup]
+firewall_driver = neutron.agent.linux.iptables_firewall.OVSHybridIptablesFirewallDriver
+enable_security_group = True
+```
+
+ - Sửa file /etc/neutron/l3_agent.ini
+ 
+```sh
+[DEFAULT]
+verbose = True
+interface_driver = neutron.agent.linux.interface.OVSInterfaceDriver
+use_namespaces = True
+external_network_bridge =
+```
+
+ - Sửa file /etc/neutron/dhcp_agent.ini
+ 
+```sh
+[DEFAULT]
+verbose = True
+interface_driver = neutron.agent.linux.interface.OVSInterfaceDriver
+dhcp_driver = neutron.agent.linux.dhcp.Dnsmasq
+enable_isolated_metadata = True
+dnsmasq_config_file = /etc/neutron/dnsmasq-neutron.conf
+```
+
+ - Tạo file /etc/neutron/dnsmasq-neutron.conf
+ 
+`vi /etc/neutron/dnsmasq-neutron.conf`
+ 
+```sh
+dhcp-option-force=26,1450
+```
+
+ - Tạo OVS br-vlan
+ 
+`ovs-vsctl add-br br-vlan`
+
+ - Gán interface vlan vào OVS br-vlan
+ 
+`ovs-vsctl add-port br-vlan ens39`
+
+ - Sao lưu file cấu hình ifcfg-ens39
+ 
+`cp /etc/sysconfig/network-scripts/ifcfg-ens39 /etc/sysconfig/network-scripts/ifcfg-ens39.bka`
+
+ - Tạo file cấu hình /etc/sysconfig/network-scripts/ifcfg-ens39 mới
+ 
+```sh
+DEVICE=ens39
+NAME=ens39
+DEVICETYPE=ovs
+TYPE=OVSPort
+OVS_BRIDGE=br-vlan
+ONBOOT=yes
+BOOTPROTO=none
+```
+
+ - Tạo file cấu hình /etc/sysconfig/network-scripts/ifcfg-br-vlan mới
+
+```sh
+ONBOOT=yes
+DEVICE=br-vlan
+NAME=br-vlan
+DEVICETYPE=ovs
+OVSBOOTPROTO=none
+TYPE=OVSBridge
+```
+ - Restart network
+ 
+`systemctl restart network`
+
+ - Khởi động lại các dịch vụ :
+ 
+```sh
+systemctl restart openvswitch.service
+systemctl restart neutron-server.service 
+systemctl restart neutron-openvswitch-agent.service 
+systemctl restart neutron-dhcp-agent.service 
+systemctl restart neutron-metadata-agent.service
+
+## 5.2 Thực hiện trên node Compute
+
+ - Sửa file /etc/neutron/plugins/ml2/openvswitch_agent.ini
+ 
+```sh
+[ovs]
+local_ip = 192.168.11.20
+bridge_mappings = vlan:br-vlan
+
+[agent]
+tunnel_types = gre,vxlan
+l2_population = True
+prevent_arp_spoofing = True
+
+[securitygroup]
+firewall_driver = neutron.agent.linux.iptables_firewall.OVSHybridIptablesFirewallDriver
+enable_security_group = True
+```
+
+ - Tạo OVS br-vlan
+ 
+`ovs-vsctl add-br br-vlan`
+
+ - Gán interface vlan vào OVS br-vlan
+ 
+`ovs-vsctl add-port br-vlan ens39`
+
+ - Sao lưu file cấu hình ifcfg-ens39
+ 
+`cp /etc/sysconfig/network-scripts/ifcfg-ens39 /etc/sysconfig/network-scripts/ifcfg-ens39.bka`
+
+ - Tạo file cấu hình /etc/sysconfig/network-scripts/ifcfg-ens39 mới
+ 
+```sh
+DEVICE=ens39
+NAME=ens39
+DEVICETYPE=ovs
+TYPE=OVSPort
+OVS_BRIDGE=br-vlan
+ONBOOT=yes
+BOOTPROTO=none
+```
+
+ - Tạo file cấu hình /etc/sysconfig/network-scripts/ifcfg-br-vlan mới
+
+```sh
+ONBOOT=yes
+DEVICE=br-vlan
+NAME=br-vlan
+DEVICETYPE=ovs
+OVSBOOTPROTO=none
+TYPE=OVSBridge
+```
+ - Restart network
+ 
+`systemctl restart network`
+
+ - Khởi động lại các dịch vụ :
+ 
+```sh
+systemctl restart openvswitch.service
+systemctl restart neutron-openvswitch-agent.service 
+```
+
+## 5.3 Kiểm tra 
+
+ - Đúng trên CTL, `source admin-rc`, sau đó kiểm tra neutron
+ 
+`neutron agent-list`
+
+![ops](/ManhDV/OpenStack/images/neutron-agent-list.png)
+
+
 # 5. Tạo máy ảo
 
  - Tạo network public
@@ -1249,7 +1456,8 @@ neutron subnet-create --name public_subnet \
  - Tạo network private
 
 ```sh
-neutron net-create private_network
+neutron net-create private_network --provider:network_type vxlan
+
 neutron subnet-create --name private_subnet private_network 10.0.0.0/24 \
 --dns-nameserver 8.8.8.8
 ```
@@ -1261,3 +1469,38 @@ neutron router-create router
 neutron router-gateway-set router external_network
 neutron router-interface-add router private_subnet
 ```
+
+ - Kiểm tra các network đang có
+ 
+`ip netns`
+
+```
+qrouter-4d7928a0-4a3c-4b99-b01b-97da2f97e279
+qdhcp-353f5937-a2d3-41ba-8225-fa1af2538141
+```
+
+ - Kiểm tra các dải mạng đang gắn vào router
+ 
+`neutron router-port-list router`
+
+![ops](/ManhDV/OpenStack/images/router.png)
+
+ - Tạo máy ảo và ping đến gateway ip của router để kiểm tra
+ 
+```sh
+openstack server create mdt --image cirros  --flavor m1.tiny --nic net-id=e111bed7-aa46-4489-b52b-de7d3baf5614 
+```
+
+ - Ping ra gateway 10.0.0.1 và ping ra Internet để kiểm tra
+ 
+ - Tạo floating IP cho VM
+ 
+`neutron floatingip-create external_network`
+![ops](/ManhDV/OpenStack/images/floatingip.png)
+
+ - Gán IP floating cho vm
+ 
+`nova floating-ip-associate vm1 172.16.69.84`
+
+ - Đăng nhập SSH với IP này kiểm tra.
+
