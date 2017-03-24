@@ -6,7 +6,7 @@
 
  -	Mô hình
 
-![ops](/ManhDV/OpenStack/images/OPS-system.png)
+![ops](/ManhDV/OpenStack/images/ops-bonding.png)
 
  -	IP Planing
 
