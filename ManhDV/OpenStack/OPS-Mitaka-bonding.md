@@ -12,6 +12,8 @@
 
 ![ops](/ManhDV/OpenStack/images/ipplan-02.png)
 
+**Chú ý** : Tên card mạng và bond có thể thay đổi
+
 # 2. Setup môi trường cài đặt (Trên cả CTL và COM)
 
  -	Cấu hình file host
@@ -700,7 +702,7 @@ exit
 
  - Tạo user neutron
  
-`vi admin-rc`
+`. admin-rc`
  
 `openstack user create neutron --domain default --password Welcome123`
 
@@ -864,17 +866,17 @@ metadata_proxy_shared_secret = Welcome123
 
  - Gán interface provider vào OVS provider
  
-`ovs-vsctl add-port br-provider eno33554960`
+`ovs-vsctl add-port br-provider bond1`
 
- - Sao lưu file cấu hình ifcfg-eno33554960
+ - Sao lưu file cấu hình ifcfg-bond1
  
-`cp /etc/sysconfig/network-scripts/ifcfg-eno33554960 /etc/sysconfig/network-scripts/ifcfg-eno33554960.bka`
+`cp /etc/sysconfig/network-scripts/ifcfg-bond1 /etc/sysconfig/network-scripts/ifcfg-bond1.bka`
 
- - Tạo file cấu hình /etc/sysconfig/network-scripts/ifcfg-eno33554960 mới
+ - Tạo file cấu hình /etc/sysconfig/network-scripts/ifcfg-bond1 mới
  
 ```sh
-DEVICE=eno33554960
-NAME=eno33554960
+DEVICE=bond1
+NAME=bond1
 DEVICETYPE=ovs
 TYPE=OVSPort
 OVS_BRIDGE=br-provider
@@ -900,10 +902,10 @@ TYPE=OVSBridge
  
 `systemctl restart network`
 
- - Kiểm tra nếu IP trên card eno33554960 chưa mất, xóa IP bằng tay và restart network:
+ - Kiểm tra nếu IP trên card bond1 chưa mất, xóa IP bằng tay và restart network:
  
 ```sh
-ip addr del 172.16.69.11/24 dev eno33554960
+ip addr del 172.16.69.11/24 dev bond1
 systemctl restart network
 ```
 
@@ -1172,17 +1174,17 @@ systemctl start neutron-openvswitch-agent.service
 
  - Gán interface provider vào OVS provider
  
-`ovs-vsctl add-port br-provider eno33554960`
+`ovs-vsctl add-port br-provider bond1`
 
- - Sao lưu file cấu hình ifcfg-eno33554960
+ - Sao lưu file cấu hình ifcfg-bond1
  
-`cp /etc/sysconfig/network-scripts/ifcfg-eno33554960 /etc/sysconfig/network-scripts/ifcfg-eno33554960.bka`
+`cp /etc/sysconfig/network-scripts/ifcfg-bond1 /etc/sysconfig/network-scripts/ifcfg-bond1.bka`
 
- - Tạo file cấu hình /etc/sysconfig/network-scripts/ifcfg-eno33554960 mới
+ - Tạo file cấu hình /etc/sysconfig/network-scripts/ifcfg-bond1 mới
  
 ```sh
-DEVICE=eno33554960
-NAME=eno33554960
+DEVICE=bond1
+NAME=bond1
 DEVICETYPE=ovs
 TYPE=OVSPort
 OVS_BRIDGE=br-provider
@@ -1208,10 +1210,10 @@ TYPE=OVSBridge
  
 `systemctl restart network`
 
- - Kiểm tra nếu IP trên card eno33554960 chưa mất, xóa IP bằng tay và restart network:
+ - Kiểm tra nếu IP trên card bond1 chưa mất, xóa IP bằng tay và restart network:
  
 ```sh
-ip addr del 172.16.69.21/24 dev eno33554960
+ip addr del 172.16.69.21/24 dev bond1
 systemctl restart network
 ```
 cd
