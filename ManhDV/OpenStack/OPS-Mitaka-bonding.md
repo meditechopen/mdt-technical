@@ -882,6 +882,9 @@ TYPE=OVSPort
 OVS_BRIDGE=br-provider
 ONBOOT=yes
 BOOTPROTO=none
+BONDING_MASTER=yes
+BONDING_OPTS="mode=1 miimon=100"
+NM_CONTROLLED=no
 ```
 
  - Tạo file cấu hình /etc/sysconfig/network-scripts/ifcfg-br-provider mới
@@ -902,12 +905,6 @@ TYPE=OVSBridge
  
 `systemctl restart network`
 
- - Kiểm tra nếu IP trên card bond1 chưa mất, xóa IP bằng tay và restart network:
- 
-```sh
-ip addr del 172.16.69.11/24 dev bond1
-systemctl restart network
-```
 
  - Tạo symbolic link từ ml2_conf.ini tới neutron/plugin.ini 
  
@@ -1190,6 +1187,10 @@ TYPE=OVSPort
 OVS_BRIDGE=br-provider
 ONBOOT=yes
 BOOTPROTO=none
+BONDING_MASTER=yes
+BONDING_OPTS="mode=1 miimon=100"
+NM_CONTROLLED=no
+
 ```
 
  - Tạo file cấu hình /etc/sysconfig/network-scripts/ifcfg-br-provider mới
@@ -1210,14 +1211,6 @@ TYPE=OVSBridge
  
 `systemctl restart network`
 
- - Kiểm tra nếu IP trên card bond1 chưa mất, xóa IP bằng tay và restart network:
- 
-```sh
-ip addr del 172.16.69.21/24 dev bond1
-systemctl restart network
-```
-cd
-,.
  - Restart dịch vụ OVS agent
  
 `systemctl restart neutron-openvswitch-agent.service`
