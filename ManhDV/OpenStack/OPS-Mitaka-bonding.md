@@ -6,11 +6,13 @@
 
  -	Mô hình
  
-![ops](/ManhDV/OpenStack/images/ops-ovs-system.png)
+![ops](/ManhDV/OpenStack/images/ops-bonding.png)
 
  -	IP Planing
 
-![ops](/ManhDV/OpenStack/images/ipplan-01.png)
+![ops](/ManhDV/OpenStack/images/ipplan-02.png)
+
+**Chú ý** : Tên card mạng và bond có thể thay đổi
 
 # 2. Setup môi trường cài đặt (Trên cả CTL và COM)
 
@@ -21,8 +23,8 @@
 ```sh
 127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4
 ::1         localhost localhost.localdomain localhost6 localhost6.localdomain6
-172.16.69.10    controller
-172.16.69.20    compute
+172.16.69.11    ctl02
+172.16.69.21    com02
 ```
 
 `vi /etc/resolv.conf`
@@ -91,7 +93,7 @@ sed -i 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/selinux/config
  - Chỉnh sửa file cấu hình /etc/chrony/chrony.conf
  
 ```sh
-sed -i "s/server 0.rhel.pool.ntp.org iburst/server 172.16.69.10 iburst/g" /etc/chrony.conf
+sed -i "s/server 0.rhel.pool.ntp.org iburst/server 172.16.69.11 iburst/g" /etc/chrony.conf
 
 sed -i 's/server 1.rhel.pool.ntp.org iburst/#server 1.rhel.pool.ntp.org iburst/g' /etc/chrony.conf
 
@@ -128,7 +130,7 @@ systemctl start chronyd.service
 ```sh
 [mysqld]
 
-bind-address = 172.16.69.10
+bind-address = 172.16.69.11
 default-storage-engine = innodb
 innodb_file_per_table
 max_connections = 4096
@@ -239,7 +241,7 @@ admin_token = e27814f52b002f1e813d
 
 [database]
 
-connection = mysql+pymysql://keystone:Welcome123@172.16.69.10/keystone
+connection = mysql+pymysql://keystone:Welcome123@172.16.69.11/keystone
 
 [token]
 
@@ -259,7 +261,7 @@ su -s /bin/sh -c "keystone-manage db_sync" keystone
 
  - Chỉnh sửa file /etc/httpd/conf/httpd.conf
  
-`echo 'ServerName 172.16.69.10' >> /etc/httpd/conf/httpd.conf`
+`echo 'ServerName 172.16.69.11' >> /etc/httpd/conf/httpd.conf`
 
  - Tạo file /etc/httpd/conf.d/wsgi-keystone.conf 
  
@@ -311,7 +313,7 @@ systemctl restart httpd.service
  
 ```sh
 export OS_TOKEN=e27814f52b002f1e813d
-export OS_URL=http://172.16.69.10:35357/v3
+export OS_URL=http://172.16.69.11:35357/v3
 export OS_IDENTITY_API_VERSION=3
 ```
 
@@ -322,11 +324,11 @@ export OS_IDENTITY_API_VERSION=3
  - Tạo API endpoints cho keystone
  
 ```sh
-openstack endpoint create --region RegionOne identity public http://172.16.69.10:5000/v3
+openstack endpoint create --region RegionOne identity public http://172.16.69.11:5000/v3
   
-openstack endpoint create --region RegionOne identity internal http://172.16.69.10:5000/v3
+openstack endpoint create --region RegionOne identity internal http://172.16.69.11:5000/v3
   
-openstack endpoint create --region RegionOne identity admin http://172.16.69.10:35357/v3
+openstack endpoint create --region RegionOne identity admin http://172.16.69.11:35357/v3
 ```
 
  - Tạo domain default
@@ -396,11 +398,11 @@ openstack user create demo --domain default --password Welcome123
  - Tạo user admin và demo, password là `Welcome123`
  
 ```sh
-openstack --os-auth-url http://172.16.69.10:35357/v3 \
+openstack --os-auth-url http://172.16.69.11:35357/v3 \
   --os-project-domain-name default --os-user-domain-name default \
   --os-project-name admin --os-username admin token issue
   
-openstack --os-auth-url http://172.16.69.10:5000/v3 \
+openstack --os-auth-url http://172.16.69.11:5000/v3 \
   --os-project-domain-name default --os-user-domain-name default \
   --os-project-name demo --os-username demo token issue  
 ```
@@ -415,7 +417,7 @@ export OS_USER_DOMAIN_NAME=default
 export OS_PROJECT_NAME=admin
 export OS_USERNAME=admin
 export OS_PASSWORD=Welcome123
-export OS_AUTH_URL=http://172.16.69.10:35357/v3
+export OS_AUTH_URL=http://172.16.69.11:35357/v3
 export OS_IDENTITY_API_VERSION=3
 export OS_IMAGE_API_VERSION=2
 ```
@@ -428,7 +430,7 @@ export OS_USER_DOMAIN_NAME=default
 export OS_PROJECT_NAME=demo
 export OS_USERNAME=demo
 export OS_PASSWORD=Welcome123
-export OS_AUTH_URL=http://172.16.69.10:5000/v3
+export OS_AUTH_URL=http://172.16.69.11:5000/v3
 export OS_IDENTITY_API_VERSION=3
 export OS_IMAGE_API_VERSION=2
 ```
@@ -470,11 +472,11 @@ openstack user create glance --domain default --password Welcome123
  - Tạo service API endpoints 
  
 ```sh
-openstack endpoint create --region RegionOne image public http://172.16.69.10:9292
+openstack endpoint create --region RegionOne image public http://172.16.69.11:9292
 
-openstack endpoint create --region RegionOne image internal http://172.16.69.10:9292
+openstack endpoint create --region RegionOne image internal http://172.16.69.11:9292
 
-openstack endpoint create --region RegionOne image admin http://172.16.69.10:9292
+openstack endpoint create --region RegionOne image admin http://172.16.69.11:9292
 ```
 
  - Cài đặt glance
@@ -489,12 +491,12 @@ openstack endpoint create --region RegionOne image admin http://172.16.69.10:929
 
 ```sh
 [database]
-connection = mysql+pymysql://glance:Welcome123@172.16.69.10/glance
+connection = mysql+pymysql://glance:Welcome123@172.16.69.11/glance
 
 [keystone_authtoken]
-auth_uri = http://172.16.69.10:5000
-auth_url = http://172.16.69.10:35357
-memcached_servers = 172.16.69.10:11211
+auth_uri = http://172.16.69.11:5000
+auth_url = http://172.16.69.11:35357
+memcached_servers = 172.16.69.11:11211
 auth_type = password
 project_domain_name = default
 user_domain_name = default
@@ -519,12 +521,12 @@ filesystem_store_datadir = /var/lib/glance/images/
  
 ```sh
 [database]
-connection = mysql+pymysql://glance:Welcome123@172.16.69.10/glance
+connection = mysql+pymysql://glance:Welcome123@172.16.69.11/glance
 
 [keystone_authtoken]
-auth_uri = http://172.16.69.10:5000
-auth_url = http://172.16.69.10:35357
-memcached_servers = 172.16.69.10:11211
+auth_uri = http://172.16.69.11:5000
+auth_url = http://172.16.69.11:35357
+memcached_servers = 172.16.69.11:11211
 auth_type = password
 project_domain_name = default
 user_domain_name = default
@@ -603,11 +605,11 @@ exit
  - Tạo API endpoints cho Nova
  
 ```sh
-openstack endpoint create --region RegionOne compute public http://172.16.69.10:8774/v2.1/%\(tenant_id\)s
+openstack endpoint create --region RegionOne compute public http://172.16.69.11:8774/v2.1/%\(tenant_id\)s
   
-openstack endpoint create --region RegionOne compute internal http://172.16.69.10:8774/v2.1/%\(tenant_id\)s
+openstack endpoint create --region RegionOne compute internal http://172.16.69.11:8774/v2.1/%\(tenant_id\)s
 
-openstack endpoint create --region RegionOne compute admin http://172.16.69.10:8774/v2.1/%\(tenant_id\)s
+openstack endpoint create --region RegionOne compute admin http://172.16.69.11:8774/v2.1/%\(tenant_id\)s
 ```
 
  - Cài đặt nova
@@ -626,7 +628,7 @@ yum install -y openstack-nova-api openstack-nova-conductor \
  
 ```sh
 [DEFAULT]
-my_ip = 172.16.69.10
+my_ip = 172.16.69.11
 enabled_apis = osapi_compute,metadata
 rpc_backend = rabbit
 auth_strategy = keystone
@@ -634,20 +636,20 @@ use_neutron = True
 firewall_driver = nova.virt.firewall.NoopFirewallDriver
 
 [api_database]
-connection = mysql+pymysql://nova:Welcome123@172.16.69.10/nova_api
+connection = mysql+pymysql://nova:Welcome123@172.16.69.11/nova_api
 
 [database]
-connection = mysql+pymysql://nova:Welcome123@172.16.69.10/nova
+connection = mysql+pymysql://nova:Welcome123@172.16.69.11/nova
 
 [oslo_messaging_rabbit]
-rabbit_host = 172.16.69.10
+rabbit_host = 172.16.69.11
 rabbit_userid = openstack
 rabbit_password = Welcome123
 
 [keystone_authtoken]
-auth_uri = http://172.16.69.10:5000
-auth_url = http://172.16.69.10:35357
-memcached_servers = 172.16.69.10:11211
+auth_uri = http://172.16.69.11:5000
+auth_url = http://172.16.69.11:35357
+memcached_servers = 172.16.69.11:11211
 auth_type = password
 project_domain_name = default
 user_domain_name = default
@@ -660,7 +662,7 @@ vncserver_listen = $my_ip
 vncserver_proxyclient_address = $my_ip
 
 [glance]
-api_servers = http://172.16.69.10:9292
+api_servers = http://172.16.69.11:9292
 
 [oslo_concurrency]
 lock_path = /var/lib/nova/tmp
@@ -700,7 +702,7 @@ exit
 
  - Tạo user neutron
  
-`vi admin-rc`
+`. admin-rc`
  
 `openstack user create neutron --domain default --password Welcome123`
 
@@ -715,11 +717,11 @@ exit
  - Tạo API endpoints cho neutron
  
 ```sh
-openstack endpoint create --region RegionOne network public http://172.16.69.10:9696
+openstack endpoint create --region RegionOne network public http://172.16.69.11:9696
 
-openstack endpoint create --region RegionOne network internal http://172.16.69.10:9696
+openstack endpoint create --region RegionOne network internal http://172.16.69.11:9696
 
-openstack endpoint create --region RegionOne network admin http://172.16.69.10:9696
+openstack endpoint create --region RegionOne network admin http://172.16.69.11:9696
 ```
  
  - Cài đặt Neutron sử dụng openvSwitch
@@ -743,17 +745,17 @@ notify_nova_on_port_data_changes = True
 dhcp_agents_per_network = 2
 
 [database]
-connection = mysql+pymysql://neutron:Welcome123@172.16.69.10/neutron
+connection = mysql+pymysql://neutron:Welcome123@172.16.69.11/neutron
 
 [oslo_messaging_rabbit]
-rabbit_host = 172.16.69.10
+rabbit_host = 172.16.69.11
 rabbit_userid = openstack
 rabbit_password = Welcome123
 
 [keystone_authtoken]
-auth_uri = http://172.16.69.10:5000
-auth_url = http://172.16.69.10:35357
-memcached_servers = 172.16.69.10:11211
+auth_uri = http://172.16.69.11:5000
+auth_url = http://172.16.69.11:35357
+memcached_servers = 172.16.69.11:11211
 auth_type = password
 project_domain_name = default
 user_domain_name = default
@@ -762,7 +764,7 @@ username = neutron
 password = Welcome123
 
 [nova]
-auth_url = http://172.16.69.10:35357
+auth_url = http://172.16.69.11:35357
 auth_type = password
 project_domain_name = default
 user_domain_name = default
@@ -821,7 +823,7 @@ dhcp_driver = neutron.agent.linux.dhcp.Dnsmasq
  
 ```sh
 [DEFAULT]
-nova_metadata_ip = 172.16.69.10
+nova_metadata_ip = 172.16.69.11
 metadata_proxy_shared_secret = Welcome123
 ```
 
@@ -844,8 +846,8 @@ enable_security_group = True
  
 ```sh
 [neutron]
-url = http://172.16.69.10:9696
-auth_url = http://172.16.69.10:35357
+url = http://172.16.69.11:9696
+auth_url = http://172.16.69.11:35357
 auth_type = password
 project_domain_name = default
 user_domain_name = default
@@ -864,29 +866,32 @@ metadata_proxy_shared_secret = Welcome123
 
  - Gán interface provider vào OVS provider
  
-`ovs-vsctl add-port br-provider eno33554960`
+`ovs-vsctl add-port br-provider bond1`
 
- - Sao lưu file cấu hình ifcfg-eno33554960
+ - Sao lưu file cấu hình ifcfg-bond1
  
-`cp /etc/sysconfig/network-scripts/ifcfg-eno33554960 /etc/sysconfig/network-scripts/ifcfg-eno33554960.bka`
+`cp /etc/sysconfig/network-scripts/ifcfg-bond1 /etc/sysconfig/network-scripts/ifcfg-bond1.bka`
 
- - Tạo file cấu hình /etc/sysconfig/network-scripts/ifcfg-eno33554960 mới
+ - Tạo file cấu hình /etc/sysconfig/network-scripts/ifcfg-bond1 mới
  
 ```sh
-DEVICE=eno33554960
-NAME=eno33554960
+DEVICE=bond1
+NAME=bond1
 DEVICETYPE=ovs
 TYPE=OVSPort
 OVS_BRIDGE=br-provider
 ONBOOT=yes
 BOOTPROTO=none
+BONDING_MASTER=yes
+BONDING_OPTS="mode=1 miimon=100"
+NM_CONTROLLED=no
 ```
 
  - Tạo file cấu hình /etc/sysconfig/network-scripts/ifcfg-br-provider mới
 
 ```sh
 ONBOOT=yes
-IPADDR=172.16.69.10
+IPADDR=172.16.69.11
 NETMASK=255.255.255.0
 GATEWAY=172.16.69.1
 DNS=8.8.8.8
@@ -900,12 +905,6 @@ TYPE=OVSBridge
  
 `systemctl restart network`
 
- - Kiểm tra nếu IP trên card eno33554960 chưa mất, xóa IP bằng tay và restart network:
- 
-```sh
-ip addr del 172.16.69.10/24 dev eno33554960
-systemctl restart network
-```
 
  - Tạo symbolic link từ ml2_conf.ini tới neutron/plugin.ini 
  
@@ -958,7 +957,7 @@ systemctl start neutron-metadata-agent.service
  - Sửa file cấu hình /etc/openstack-dashboard/local_settings
  
 ```sh
-OPENSTACK_HOST = "172.16.69.10"
+OPENSTACK_HOST = "172.16.69.11"
 
 ALLOWED_HOSTS = ['*', ]
 
@@ -967,7 +966,7 @@ SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
 CACHES = {
     'default': {
          'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
-         'LOCATION': '172.16.69.10:11211',
+         'LOCATION': '172.16.69.11:11211',
     }
 }
 
@@ -1020,7 +1019,7 @@ OPENSTACK_NEUTRON_NETWORK = {
  
 ```sh
 [DEFAULT]
-my_ip = 172.16.69.20
+my_ip = 172.16.69.21
 rpc_backend = rabbit
 auth_strategy = keystone
 use_neutron = True
@@ -1028,7 +1027,7 @@ firewall_driver = nova.virt.firewall.NoopFirewallDriver
 compute_driver=libvirt.LibvirtDriver
 
 [oslo_messaging_rabbit]
-rabbit_host = 172.16.69.10
+rabbit_host = 172.16.69.11
 rabbit_userid = openstack
 rabbit_password = Welcome123
 
@@ -1037,9 +1036,9 @@ virt_type=kvm
 cpu_mode=none
 
 [keystone_authtoken]
-auth_uri = http://172.16.69.10:5000
-auth_url = http://172.16.69.10:35357
-memcached_servers = 172.16.69.10:11211
+auth_uri = http://172.16.69.11:5000
+auth_url = http://172.16.69.11:35357
+memcached_servers = 172.16.69.11:11211
 auth_type = password
 project_domain_name = default
 user_domain_name = default
@@ -1051,10 +1050,10 @@ password = Welcome123
 enabled = True
 vncserver_listen = 0.0.0.0
 vncserver_proxyclient_address = $my_ip
-novncproxy_base_url = http://172.16.69.10:6080/vnc_auto.html
+novncproxy_base_url = http://172.16.69.11:6080/vnc_auto.html
 
 [glance]
-api_servers = http://172.16.69.10:9292
+api_servers = http://172.16.69.11:9292
 
 [oslo_concurrency]
 lock_path = /var/lib/nova/tmp
@@ -1107,14 +1106,14 @@ notify_nova_on_port_status_changes = true
 notify_nova_on_port_data_changes = true
 
 [oslo_messaging_rabbit]
-rabbit_host = 172.16.69.10
+rabbit_host = 172.16.69.11
 rabbit_userid = openstack
 rabbit_password = Welcome123
 
 [keystone_authtoken]
-auth_uri = http://172.16.69.10:5000
-auth_url = http://172.16.69.10:35357
-memcached_servers = 172.16.69.10:11211
+auth_uri = http://172.16.69.11:5000
+auth_url = http://172.16.69.11:35357
+memcached_servers = 172.16.69.11:11211
 auth_type = password
 project_domain_name = default
 user_domain_name = default
@@ -1145,8 +1144,8 @@ enable_security_group = True
  
 ```sh
 [neutron]
-url = http://172.16.69.10:9696
-auth_url = http://172.16.69.10:35357
+url = http://172.16.69.11:9696
+auth_url = http://172.16.69.11:35357
 auth_type = password
 project_domain_name = default
 user_domain_name = default
@@ -1172,29 +1171,33 @@ systemctl start neutron-openvswitch-agent.service
 
  - Gán interface provider vào OVS provider
  
-`ovs-vsctl add-port br-provider eno33554960`
+`ovs-vsctl add-port br-provider bond1`
 
- - Sao lưu file cấu hình ifcfg-eno33554960
+ - Sao lưu file cấu hình ifcfg-bond1
  
-`cp /etc/sysconfig/network-scripts/ifcfg-eno33554960 /etc/sysconfig/network-scripts/ifcfg-eno33554960.bka`
+`cp /etc/sysconfig/network-scripts/ifcfg-bond1 /etc/sysconfig/network-scripts/ifcfg-bond1.bka`
 
- - Tạo file cấu hình /etc/sysconfig/network-scripts/ifcfg-eno33554960 mới
+ - Tạo file cấu hình /etc/sysconfig/network-scripts/ifcfg-bond1 mới
  
 ```sh
-DEVICE=eno33554960
-NAME=eno33554960
+DEVICE=bond1
+NAME=bond1
 DEVICETYPE=ovs
 TYPE=OVSPort
 OVS_BRIDGE=br-provider
 ONBOOT=yes
 BOOTPROTO=none
+BONDING_MASTER=yes
+BONDING_OPTS="mode=1 miimon=100"
+NM_CONTROLLED=no
+
 ```
 
  - Tạo file cấu hình /etc/sysconfig/network-scripts/ifcfg-br-provider mới
 
 ```sh
 ONBOOT=yes
-IPADDR=172.16.69.20
+IPADDR=172.16.69.21
 NETMASK=255.255.255.0
 GATEWAY=172.16.69.1
 DNS=8.8.8.8
@@ -1208,14 +1211,6 @@ TYPE=OVSBridge
  
 `systemctl restart network`
 
- - Kiểm tra nếu IP trên card eno33554960 chưa mất, xóa IP bằng tay và restart network:
- 
-```sh
-ip addr del 172.16.69.20/24 dev eno33554960
-systemctl restart network
-```
-cd
-,.
  - Restart dịch vụ OVS agent
  
 `systemctl restart neutron-openvswitch-agent.service`
@@ -1271,7 +1266,7 @@ enable_ipset = True
  
 ```sh
 [ovs]
-local_ip = 192.168.11.10
+local_ip = 192.168.11.11
 bridge_mappings = vlan:br-vlan,provider:br-provider
 
 [agent]
@@ -1368,7 +1363,7 @@ systemctl restart neutron-l3-agent
  
 ```sh
 [ovs]
-local_ip = 192.168.11.20
+local_ip = 192.168.11.21
 bridge_mappings = vlan:br-vlan
 
 [agent]
@@ -1451,7 +1446,7 @@ neutron net-create external_network --provider:network_type flat \
 ```sh
 neutron subnet-create --name public_subnet \
 --enable_dhcp=True --dns-nameserver 8.8.8.8 \
---allocation-pool=start=172.16.69.80,end=172.16.69.100 \
+--allocation-pool=start=172.16.69.80,end=172.16.69.110 \
 --gateway=172.16.69.1 external_network 172.16.69.0/24
 ```
 
