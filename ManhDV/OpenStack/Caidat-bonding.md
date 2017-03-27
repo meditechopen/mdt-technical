@@ -10,7 +10,7 @@
 
  -	IP Planing
 
-![ops](/ManhDV/OpenStack/images/ipplan.png)
+![ops](/ManhDV/OpenStack/images/ipplan-02.png)
 
 ## 2. Cài đặt và cấu hình Bonding (Thực hiện trên 2 node CTL và COM)
 
