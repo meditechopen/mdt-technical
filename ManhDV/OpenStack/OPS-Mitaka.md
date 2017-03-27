@@ -125,7 +125,7 @@ sed -i 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/selinux/config
  - Chỉnh sửa file cấu hình /etc/chrony/chrony.conf
  
 ```sh
-sed -i "s/server 0.rhel.pool.ntp.org iburst/server 172.16.69.10 iburst/g" /etc/chrony.conf
+sed -i "s/server 0.rhel.pool.ntp.org iburst/server vn.pool.ntp.org iburst/g" /etc/chrony.conf
 
 sed -i 's/server 1.rhel.pool.ntp.org iburst/#server 1.rhel.pool.ntp.org iburst/g' /etc/chrony.conf
 
@@ -1052,8 +1052,8 @@ OPENSTACK_NEUTRON_NETWORK = {
 ```sh
 127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4
 ::1         localhost localhost.localdomain localhost6 localhost6.localdomain6
-172.16.69.11    ctl02
-172.16.69.21    com02
+172.16.69.10    controller
+172.16.69.20    compute
 ```
 
 `vi /etc/resolv.conf`
@@ -1126,7 +1126,7 @@ sed -i 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/selinux/config
  - Chỉnh sửa file cấu hình /etc/chrony/chrony.conf
  
 ```sh
-sed -i "s/server 0.rhel.pool.ntp.org iburst/server 172.16.69.11 iburst/g" /etc/chrony.conf
+sed -i "s/server 0.rhel.pool.ntp.org iburst/server 172.16.69.10 iburst/g" /etc/chrony.conf
 
 sed -i 's/server 1.rhel.pool.ntp.org iburst/#server 1.rhel.pool.ntp.org iburst/g' /etc/chrony.conf
 

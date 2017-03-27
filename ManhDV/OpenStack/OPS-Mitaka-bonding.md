@@ -1385,7 +1385,7 @@ openstack server create mdt-cirros --image cirros  --flavor m1.tiny --nic net-id
 
 ![ops](/ManhDV/OpenStack/images/test-vm-02.png) 
  
-# 4. Cài đặt mô hình network Self-service <a name="4"> </a> 
+# 4 Cài đặt mô hình network Self-service <a name="4"> </a> 
 
  - Trên node CTL và COM, tạo thêm bond2. Tạo đường br-vlan để vm có thể kết nối tới router ảo trên CTL.
  
