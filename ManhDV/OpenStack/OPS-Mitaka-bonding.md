@@ -14,9 +14,13 @@
 
 **Chú ý** : Tên card mạng và bond có thể thay đổi
 
-# 2. Setup môi trường cài đặt (Trên cả CTL và COM)
+# 2. Cài đặt trên CTL
 
- -	Cấu hình file host
+## 2.1 Setup môi trường cài đặt
+
+ - Setup bonding cho node CTL. Tham khảo link [sau]()
+ 
+ - Cấu hình file hosts
  
 `vi /etc/hosts`
  
@@ -76,6 +80,10 @@ sed -i 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/selinux/config
  
 `yum install -y http://dl.fedoraproject.org/pub/epel/7/x86_64/b/byobu-5.73-4.el7.noarch.rpm wget`
 
+ - Chạy lệnh byobu
+ 
+`byobu`
+
  - Cài đặt openstack-client để sử dụng các câu lệnh openstack
  
 `yum install python-openstackclient -y`
@@ -84,16 +92,17 @@ sed -i 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/selinux/config
  
 `yum install openstack-selinux -y`
 
-## 2.1 Cài đặt và cấu hình dịch vụ đồng bộ thời gian NTP
 
- - Cài đặt NTP
+## 2.2 Cài đặt các thành phần phụ trợ
+
+### 2.2.1 Cài đặt NTP
  
 `yum install chrony -y `
 
  - Chỉnh sửa file cấu hình /etc/chrony/chrony.conf
  
 ```sh
-sed -i "s/server 0.rhel.pool.ntp.org iburst/server 172.16.69.11 iburst/g" /etc/chrony.conf
+sed -i "s/server 0.rhel.pool.ntp.org iburst/server vn.pool.ntp.org iburst/g" /etc/chrony.conf
 
 sed -i 's/server 1.rhel.pool.ntp.org iburst/#server 1.rhel.pool.ntp.org iburst/g' /etc/chrony.conf
 
@@ -114,10 +123,9 @@ systemctl start chronyd.service
  
 `chronyc sources`
 
-![ops](/ManhDV/OpenStack/images/ntp.png)
+![ops](/ManhDV/OpenStack/images/chrony-ctl.png)
 
-# 3. Cài đặt trên node Controller
-## 3.1 Cài đặt và cấu hình database MySQL
+### 2.2.2 Cài đặt và cấu hình database MySQL
 
  - Cài đặt database MySQL
 
@@ -161,7 +169,7 @@ Remove test database and access to it? [Y/n]: y
 Reload privilege tables now? [Y/n]: y
 ```
 
-## 3.2 Cài đặt và cấu hình RabbitMQ
+### 2.2.3 Cài đặt và cấu hình RabbitMQ
 
  - Cài đặt rabbitmq
  
@@ -182,7 +190,7 @@ systemctl start rabbitmq-server.service
 
 `rabbitmqctl set_permissions openstack ".*" ".*" ".*"`
 
-## 3.3. Cài đặt và cấu hình Memcache
+### 2.2.4 Cài đặt và cấu hình Memcache
 
  - Cài đặt memcache
  
@@ -203,7 +211,9 @@ systemctl enable memcached.service
 systemctl start memcached.service
 ```
 
-## 3.4 Cài đặt và cấu hình Keystone
+## 3. Cài đặt các thành phân lõi 
+
+## 3.1 Cài đặt và cấu hình Keystone
 
  - Tạo database cho keystone
  
@@ -441,7 +451,7 @@ export OS_IMAGE_API_VERSION=2
 
 `openstack token issue`
 
-## 3.5. Cài đặt và cấu hình Glance
+## 3.2 Cài đặt và cấu hình Glance
 
  - Tạo database cho Glance
  
@@ -570,7 +580,7 @@ openstack image create "cirros" \
  
 `openstack image list `
 
-## 3.6 Cài đặt Nova
+## 3.3 Cài đặt Nova
 
  - Tạo database cho Nova
  
@@ -687,7 +697,7 @@ systemctl start openstack-nova-api.service \
   openstack-nova-conductor.service openstack-nova-novncproxy.service  
 ```
 
-## 3.7 Cài đặt Neutron (Theo dạng network OpenvSwitch)
+## 3.4 Cài đặt Neutron (Theo dạng network OpenvSwitch)
 
  - Tạo database cho neutron
  
@@ -944,7 +954,7 @@ systemctl start neutron-metadata-agent.service
 
 ![ops](/ManhDV/OpenStack/images/neutron.png)
 
-## 3.8 Cài đặt và cấu hìnhHorizon
+## 3.5 Cài đặt và cấu hình Horizon
 
  - Cài đặt horizon
 
@@ -1003,9 +1013,118 @@ OPENSTACK_NEUTRON_NETWORK = {
 `systemctl restart httpd.service memcached.service`
 
 
-# 4. Cài đặt trên Compute
+# 4 Cài đặt trên Compute
 
-## 4.1. Cài đặt và cấu hình Nova
+## 4.1 Setup môi trường cài đặt
+
+ - Setup bonding cho node COM. Tham khảo link [sau]()
+ 
+ - Cấu hình file hosts
+ 
+`vi /etc/hosts`
+ 
+```sh
+127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4
+::1         localhost localhost.localdomain localhost6 localhost6.localdomain6
+172.16.69.11    ctl02
+172.16.69.21    com02
+```
+
+`vi /etc/resolv.conf`
+
+```sh
+nameserver 8.8.8.8
+```
+
+ - Kiểm tra ping ra Internet
+ 
+`ping google.com`
+
+ - Config cho các module network
+ 
+```sh
+echo "net.ipv4.ip_forward=1" >> /etc/sysctl.conf
+echo "net.ipv4.conf.all.rp_filter=0" >> /etc/sysctl.conf
+echo "net.ipv4.conf.default.rp_filter=0" >> /etc/sysctl.conf
+sysctl -p
+```
+
+ - Đăng ký tài khoản RHEL (Người dùng đã phải đăng ký bằng mail trên website của RHEL)
+ 
+```sh
+subscription-manager register --username="user" --password="userpassword" --auto-attach
+
+subscription-manager repos --enable=rhel-7-server-optional-rpms --enable=rhel-7-server-extras-rpms --enable=rhel-7-server-rh-common-rpms
+```
+
+ - Tắt firewall và selinux
+```sh
+systemctl disable firewalld
+systemctl stop firewalld
+sed -i 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/selinux/config
+```
+
+ - Khởi động lại máy
+ 
+`init 6`
+
+
+ -  Add repo và update hệ thống
+
+`yum install -y https://repos.fedorapeople.org/repos/openstack/openstack-mitaka/rdo-release-mitaka-6.noarch.rpm`
+
+`yum upgrade -y`
+
+ - Cài đặt byobu và wget 
+ 
+`yum install -y http://dl.fedoraproject.org/pub/epel/7/x86_64/b/byobu-5.73-4.el7.noarch.rpm wget`
+
+ - Chạy lệnh byobu
+ 
+`byobu`
+
+ - Cài đặt openstack-client để sử dụng các câu lệnh openstack
+ 
+`yum install python-openstackclient -y`
+
+ - Cài đặt gói openstack-selinux để quản lý policy cho các service openstack.
+ 
+`yum install openstack-selinux -y`
+
+## 4.2 Cài đặt các thành phần phụ trợ
+
+### 4.2.1 Cài đặt NTP
+ 
+`yum install chrony -y `
+
+ - Chỉnh sửa file cấu hình /etc/chrony/chrony.conf
+ 
+```sh
+sed -i "s/server 0.rhel.pool.ntp.org iburst/server 172.16.69.11 iburst/g" /etc/chrony.conf
+
+sed -i 's/server 1.rhel.pool.ntp.org iburst/#server 1.rhel.pool.ntp.org iburst/g' /etc/chrony.conf
+
+sed -i 's/server 2.rhel.pool.ntp.org iburst/#server 2.rhel.pool.ntp.org iburst/g' /etc/chrony.conf
+
+sed -i 's/server 3.rhel.pool.ntp.org iburst/#server 3.rhel.pool.ntp.org iburst/g' /etc/chrony.conf
+
+```
+ - Restart dịch vụ ntp
+ 
+```sh
+systemctl enable chronyd.service
+systemctl start chronyd.service
+```
+ - Chạy lệnh kiểm tra trên COM
+ 
+`chronyc sources`
+
+![ops](/ManhDV/OpenStack/images/ntp.png)
+
+
+## 4.3 Cài đặt các thành phần lõi
+
+### 4.3.1 Cài đặt và cấu hình Nova
 
  - Cài đặt nova
  
@@ -1085,7 +1204,7 @@ systemctl start libvirtd.service openstack-nova-compute.service
 
 ![ops](/ManhDV/OpenStack/images/nova.png)
 
-## 4.2. Cài đặt và cấu hình neutron openvSwitch
+### 4.3.2 Cài đặt và cấu hình neutron openvSwitch
 
  - Cài đặt neutron openvswitch
  
@@ -1219,7 +1338,7 @@ TYPE=OVSBridge
  
 `. admin-rc`
 
-`openstack network agent list`
+`neutron agent-list`
 
 # 5. Cài đặt mô hình network Self-service
 
