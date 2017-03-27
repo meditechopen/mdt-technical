@@ -45,7 +45,7 @@
 
 ## 2.1 Setup môi trường cài đặt <a name="2.1"> </a> 
 
- - Setup bonding cho node CTL. Tham khảo link [sau]()
+ - Setup bonding cho node CTL. Tham khảo link [sau](https://github.com/meditechopen/mdt-technical/blob/master/ManhDV/OpenStack/Caidat-bonding.md)
  
  - Cấu hình file hosts
  
@@ -1044,7 +1044,7 @@ OPENSTACK_NEUTRON_NETWORK = {
 
 ## 3.1 Setup môi trường cài đặt <a name="3.1"> </a> 
 
- - Setup bonding cho node COM. Tham khảo link [sau]()
+ - Setup bonding cho node COM. Tham khảo link [sau](https://github.com/meditechopen/mdt-technical/blob/master/ManhDV/OpenStack/Caidat-bonding.md)
  
  - Cấu hình file hosts
  
@@ -1367,7 +1367,9 @@ TYPE=OVSBridge
 
 `neutron agent-list`
 
- - Tạo máy ảo với image cirros, flavor tiny và dải mạng external_network
+ - Tạo máy ảo với image cirros, flavor tiny và dải mạng external_network. Quay lại node CTL.
+ 
+`. admin-rc`
  
 ```sh
 openstack server create mdt-cirros --image cirros  --flavor m1.tiny --nic net-id=external_network
