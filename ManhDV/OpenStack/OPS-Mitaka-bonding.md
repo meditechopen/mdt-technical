@@ -211,9 +211,9 @@ systemctl enable memcached.service
 systemctl start memcached.service
 ```
 
-## 3. Cài đặt các thành phân lõi 
+## 2.3. Cài đặt các thành phân lõi 
 
-## 3.1 Cài đặt và cấu hình Keystone
+## 2.3.1 Cài đặt và cấu hình Keystone
 
  - Tạo database cho keystone
  
@@ -451,7 +451,7 @@ export OS_IMAGE_API_VERSION=2
 
 `openstack token issue`
 
-## 3.2 Cài đặt và cấu hình Glance
+## 2.3.2 Cài đặt và cấu hình Glance
 
  - Tạo database cho Glance
  
@@ -580,7 +580,7 @@ openstack image create "cirros" \
  
 `openstack image list `
 
-## 3.3 Cài đặt Nova
+## 2.3.3 Cài đặt Nova
 
  - Tạo database cho Nova
  
@@ -697,7 +697,7 @@ systemctl start openstack-nova-api.service \
   openstack-nova-conductor.service openstack-nova-novncproxy.service  
 ```
 
-## 3.4 Cài đặt Neutron (Theo dạng network OpenvSwitch)
+## 2.3.4 Cài đặt Neutron (Theo dạng network OpenvSwitch)
 
  - Tạo database cho neutron
  
@@ -954,7 +954,7 @@ systemctl start neutron-metadata-agent.service
 
 ![ops](/ManhDV/OpenStack/images/neutron.png)
 
-## 3.5 Cài đặt và cấu hình Horizon
+## 2.3.5 Cài đặt và cấu hình Horizon
 
  - Cài đặt horizon
 
