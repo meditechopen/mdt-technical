@@ -1,4 +1,4 @@
-# Hướng dẫn cài đặt OpenStack Mitaka sử dụng Openvswitch : mix network Provider và Self-service
+# Hướng dẫn cài đặt OpenStack Mitaka sử dụng Openvswitch : mix network Provider và Self-service (Bonding)
 
 # Mục lục
  *	[1. Chuẩn bị](#1)
