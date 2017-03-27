@@ -1,4 +1,4 @@
-# Hướng dẫn cài đặt OpenStack trên Mitaka với mô hình Openvswitch
+# Hướng dẫn cài đặt OpenStack Mitaka sử dụng Openvswitch : mix network Provider và Self-service
 
 # 1. Chuẩn bị
 
@@ -1013,9 +1013,9 @@ OPENSTACK_NEUTRON_NETWORK = {
 `systemctl restart httpd.service memcached.service`
 
 
-# 4 Cài đặt trên Compute
+# 3 Cài đặt trên Compute
 
-## 4.1 Setup môi trường cài đặt
+## 3.1 Setup môi trường cài đặt
 
  - Setup bonding cho node COM. Tham khảo link [sau]()
  
@@ -1091,7 +1091,7 @@ sed -i 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/selinux/config
  
 `yum install openstack-selinux -y`
 
-## 4.2 Cài đặt các thành phần phụ trợ
+## 3.2 Cài đặt các thành phần phụ trợ
 
 ### 4.2.1 Cài đặt NTP
  
@@ -1122,9 +1122,9 @@ systemctl start chronyd.service
 ![ops](/ManhDV/OpenStack/images/ntp.png)
 
 
-## 4.3 Cài đặt các thành phần lõi
+## 3.3 Cài đặt các thành phần lõi
 
-### 4.3.1 Cài đặt và cấu hình Nova
+### 3.3.1 Cài đặt và cấu hình Nova
 
  - Cài đặt nova
  
@@ -1204,7 +1204,7 @@ systemctl start libvirtd.service openstack-nova-compute.service
 
 ![ops](/ManhDV/OpenStack/images/nova.png)
 
-### 4.3.2 Cài đặt và cấu hình neutron openvSwitch
+### 3.3.2 Cài đặt và cấu hình neutron openvSwitch
 
  - Cài đặt neutron openvswitch
  
@@ -1340,12 +1340,43 @@ TYPE=OVSBridge
 
 `neutron agent-list`
 
-# 5. Cài đặt mô hình network Self-service
+ - Tạo máy ảo với image cirros, flavor tiny và dải mạng external_network
+ 
+```sh
+openstack server create mdt-cirros --image cirros  --flavor m1.tiny --nic net-id=external_network
+```
 
+ - Setup **Default rules` cho các vm
+ 
+![ops](/ManhDV/OpenStack/images/default-rule.png) 
+ 
+ - Kiểm tra trên dashboard, đăng nhập và kiểm tra PING và SSH vào máy đã tạo.
+ 
+![ops](/ManhDV/OpenStack/images/test-vm-01.png) 
 
- - Tắt 2 máy CTL và COM, sau đó add thêm card VMnet2 cho cả 2 máy. Xuất hiện card ens39 thuộc VMnet2.
+![ops](/ManhDV/OpenStack/images/test-vm-02.png) 
+ 
+# 4. Cài đặt mô hình network Self-service
 
-## 5.1. Thực hiện trên node Controller
+ - Trên node CTL và COM, tạo thêm bond2. Tạo đường br-vlan để vm có thể kết nối tới router ảo trên CTL.
+ 
+ - Add thêm 2 card mạng trên VMnet2. Tạo bond2 từ 2 card này. Tham khảo cách tạo bond ở link [sau](https://github.com/meditechopen/mdt-technical/blob/master/ManhDV/OpenStack/Caidat-bonding.md)
+
+ - Cấu hình card bond2 như sau :
+ 
+```sh
+DEVICE=bond2
+TYPE=Bond
+NAME=bond2
+BONDING_MASTER=yes
+BOOTPROTO=none
+ONBOOT=yes
+BONDING_OPTS="mode=1 miimon=100"
+NM_CONTROLLED=no
+```
+
+## 4.1. Thực hiện trên node Controller
+
  - Sửa cấu hình file /etc/neutron/neutron.conf 
  
 ```sh
@@ -1433,22 +1464,25 @@ dhcp-option-force=26,1450
 
  - Gán interface vlan vào OVS br-vlan
  
-`ovs-vsctl add-port br-vlan ens39`
+`ovs-vsctl add-port br-vlan bond2`
 
- - Sao lưu file cấu hình ifcfg-ens39
+ - Sao lưu file cấu hình ifcfg-bond2
  
-`cp /etc/sysconfig/network-scripts/ifcfg-ens39 /etc/sysconfig/network-scripts/ifcfg-ens39.bka`
+`cp /etc/sysconfig/network-scripts/ifcfg-bond2 /etc/sysconfig/network-scripts/ifcfg-bond2.bka`
 
- - Tạo file cấu hình /etc/sysconfig/network-scripts/ifcfg-ens39 mới
+ - Tạo file cấu hình /etc/sysconfig/network-scripts/ifcfg-bond2 mới
  
 ```sh
-DEVICE=ens39
-NAME=ens39
+DEVICE=bond2
+NAME=bond2
 DEVICETYPE=ovs
 TYPE=OVSPort
 OVS_BRIDGE=br-vlan
 ONBOOT=yes
 BOOTPROTO=none
+BONDING_MASTER=yes
+BONDING_OPTS="mode=1 miimon=100"
+NM_CONTROLLED=no
 ```
 
  - Tạo file cấu hình /etc/sysconfig/network-scripts/ifcfg-br-vlan mới
@@ -1476,7 +1510,7 @@ systemctl restart neutron-metadata-agent.service
 systemctl restart neutron-l3-agent
 ```
 
-## 5.2 Thực hiện trên node Compute
+## 4.2 Thực hiện trên node Compute
 
  - Sửa file /etc/neutron/plugins/ml2/openvswitch_agent.ini
  
@@ -1501,22 +1535,25 @@ enable_security_group = True
 
  - Gán interface vlan vào OVS br-vlan
  
-`ovs-vsctl add-port br-vlan ens39`
+`ovs-vsctl add-port br-vlan bond2`
 
- - Sao lưu file cấu hình ifcfg-ens39
+ - Sao lưu file cấu hình ifcfg-bond2
  
-`cp /etc/sysconfig/network-scripts/ifcfg-ens39 /etc/sysconfig/network-scripts/ifcfg-ens39.bka`
+`cp /etc/sysconfig/network-scripts/ifcfg-bond2 /etc/sysconfig/network-scripts/ifcfg-bond2.bka`
 
- - Tạo file cấu hình /etc/sysconfig/network-scripts/ifcfg-ens39 mới
+ - Tạo file cấu hình /etc/sysconfig/network-scripts/ifcfg-bond2 mới
  
 ```sh
-DEVICE=ens39
-NAME=ens39
+DEVICE=bond2
+NAME=bond2
 DEVICETYPE=ovs
 TYPE=OVSPort
 OVS_BRIDGE=br-vlan
 ONBOOT=yes
 BOOTPROTO=none
+BONDING_MASTER=yes
+BONDING_OPTS="mode=1 miimon=100"
+NM_CONTROLLED=no
 ```
 
  - Tạo file cấu hình /etc/sysconfig/network-scripts/ifcfg-br-vlan mới
@@ -1540,7 +1577,7 @@ systemctl restart openvswitch.service
 systemctl restart neutron-openvswitch-agent.service 
 ```
 
-## 5.3 Kiểm tra 
+## 4.3 Kiểm tra 
 
  - Đúng trên CTL, `source admin-rc`, sau đó kiểm tra neutron
  
@@ -1549,7 +1586,7 @@ systemctl restart neutron-openvswitch-agent.service
 ![ops](/ManhDV/OpenStack/images/neutron-agent-list.png)
 
 
-# 5. Tạo máy ảo
+# 5. Tạo máy ảo theo kiểu Self-service
 
  - Tạo network public
  
