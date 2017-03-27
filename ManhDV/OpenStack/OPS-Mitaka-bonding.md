@@ -1,6 +1,33 @@
 # Hướng dẫn cài đặt OpenStack Mitaka sử dụng Openvswitch : mix network Provider và Self-service
 
-# 1. Chuẩn bị
+# Mục lục
+ *	[1. Chuẩn bị](#1)
+ *	[2. Cài đặt trên node Controller](#2)
+	*	[2.1. Setup môi trường cài đặt](#2.1)
+	*	[2.2. Cài đặt các thành phần phụ trợ](#2.2)	
+		*	[2.2.1. Cài đặt NTP](#2.2.1)
+		*	[2.2.2. Cài đặt và cấu hình database MySQL](#2.2.2)
+		*	[2.2.3 Cài đặt và cấu hình RabbitMQ](#2.2.3)
+		*	[2.2.4 Cài đặt và cấu hình Memcache](#2.2.4)
+	*	[2.3. Cài đặt các thành phân lõi](#2.3)
+		*	[2.3.1 Cài đặt và cấu hình Keystone](#2.3.1)
+		*	[2.3.2 Cài đặt và cấu hình Glance](#2.3.2)
+		*	[2.3.3 Cài đặt Nova](#2.3.3)
+		*	[2.3.4 Cài đặt Neutron (OpenvSwitch)](#2.3.4)
+		*	[2.3.5 Cài đặt và cấu hình Horizon](#2.3.5)
+*	[3 Cài đặt trên Compute](#3)
+	*	[3.1 Setup môi trường cài đặt](#3.1)
+	*	[3.2 Cài đặt các thành phần phụ trợ](#3.2)
+		*	[3.2.1 Cài đặt NTP](#3.2.1)
+	*	[3.3 Cài đặt các thành phần lõi](#3.3)
+		*	[3.3.1 Cài đặt và cấu hình Nova](#3.3.1)
+		*	[3.3.2 Cài đặt và cấu hình Neutron openvSwitch](#3.3.2)
+*	[4. Cài đặt mô hình network Self-service](#4)
+	*	[4.1. Thực hiện trên node Controller](#4.1)
+	*	[4.2 Thực hiện trên node Compute](#4.2)
+	*	[4.3 Kiểm tra](#4.3)
+*	[5. Tạo máy ảo theo dạng Self-service](#5)
+# 1. Chuẩn bị <a name="1"> </a> 
 
  -	Distro : RHEL 7 đã register
 
@@ -14,9 +41,9 @@
 
 **Chú ý** : Tên card mạng và bond có thể thay đổi
 
-# 2. Cài đặt trên CTL
+# 2. Cài đặt trên CTL <a name="2"> </a> 
 
-## 2.1 Setup môi trường cài đặt
+## 2.1 Setup môi trường cài đặt <a name="2.1"> </a> 
 
  - Setup bonding cho node CTL. Tham khảo link [sau]()
  
@@ -93,9 +120,9 @@ sed -i 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/selinux/config
 `yum install openstack-selinux -y`
 
 
-## 2.2 Cài đặt các thành phần phụ trợ
+## 2.2 Cài đặt các thành phần phụ trợ <a name="2.2"> </a> 
 
-### 2.2.1 Cài đặt NTP
+### 2.2.1 Cài đặt NTP <a name="2.2.1"> </a> 
  
 `yum install chrony -y `
 
@@ -125,7 +152,7 @@ systemctl start chronyd.service
 
 ![ops](/ManhDV/OpenStack/images/chrony-ctl.png)
 
-### 2.2.2 Cài đặt và cấu hình database MySQL
+### 2.2.2 Cài đặt và cấu hình database MySQL <a name="2.2.2"> </a> 
 
  - Cài đặt database MySQL
 
@@ -169,7 +196,7 @@ Remove test database and access to it? [Y/n]: y
 Reload privilege tables now? [Y/n]: y
 ```
 
-### 2.2.3 Cài đặt và cấu hình RabbitMQ
+### 2.2.3 Cài đặt và cấu hình RabbitMQ <a name="2.2.3"> </a> 
 
  - Cài đặt rabbitmq
  
@@ -190,7 +217,7 @@ systemctl start rabbitmq-server.service
 
 `rabbitmqctl set_permissions openstack ".*" ".*" ".*"`
 
-### 2.2.4 Cài đặt và cấu hình Memcache
+### 2.2.4 Cài đặt và cấu hình Memcache <a name="2.2.4"> </a> 
 
  - Cài đặt memcache
  
@@ -211,9 +238,9 @@ systemctl enable memcached.service
 systemctl start memcached.service
 ```
 
-## 2.3. Cài đặt các thành phân lõi 
+## 2.3. Cài đặt các thành phân lõi <a name="2.3"> </a> 
 
-## 2.3.1 Cài đặt và cấu hình Keystone
+## 2.3.1 Cài đặt và cấu hình Keystone <a name="2.3.1"> </a> 
 
  - Tạo database cho keystone
  
@@ -451,7 +478,7 @@ export OS_IMAGE_API_VERSION=2
 
 `openstack token issue`
 
-## 2.3.2 Cài đặt và cấu hình Glance
+## 2.3.2 Cài đặt và cấu hình Glance <a name="2.3.2"> </a> 
 
  - Tạo database cho Glance
  
@@ -580,7 +607,7 @@ openstack image create "cirros" \
  
 `openstack image list `
 
-## 2.3.3 Cài đặt Nova
+## 2.3.3 Cài đặt Nova <a name="2.3.3"> </a> 
 
  - Tạo database cho Nova
  
@@ -697,7 +724,7 @@ systemctl start openstack-nova-api.service \
   openstack-nova-conductor.service openstack-nova-novncproxy.service  
 ```
 
-## 2.3.4 Cài đặt Neutron (Theo dạng network OpenvSwitch)
+## 2.3.4 Cài đặt Neutron (Theo dạng network OpenvSwitch) <a name="2.3.4"> </a> 
 
  - Tạo database cho neutron
  
@@ -954,7 +981,7 @@ systemctl start neutron-metadata-agent.service
 
 ![ops](/ManhDV/OpenStack/images/neutron.png)
 
-## 2.3.5 Cài đặt và cấu hình Horizon
+## 2.3.5 Cài đặt và cấu hình Horizon <a name="2.3.5"> </a> 
 
  - Cài đặt horizon
 
@@ -1013,9 +1040,9 @@ OPENSTACK_NEUTRON_NETWORK = {
 `systemctl restart httpd.service memcached.service`
 
 
-# 3 Cài đặt trên Compute
+# 3 Cài đặt trên Compute  <a name="3"> </a> 
 
-## 3.1 Setup môi trường cài đặt
+## 3.1 Setup môi trường cài đặt <a name="3.1"> </a> 
 
  - Setup bonding cho node COM. Tham khảo link [sau]()
  
@@ -1091,9 +1118,9 @@ sed -i 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/selinux/config
  
 `yum install openstack-selinux -y`
 
-## 3.2 Cài đặt các thành phần phụ trợ
+## 3.2 Cài đặt các thành phần phụ trợ <a name="3.2"> </a> 
 
-### 4.2.1 Cài đặt NTP
+### 3.2.1 Cài đặt NTP <a name="3.2.1"> </a> 
  
 `yum install chrony -y `
 
@@ -1122,9 +1149,9 @@ systemctl start chronyd.service
 ![ops](/ManhDV/OpenStack/images/ntp.png)
 
 
-## 3.3 Cài đặt các thành phần lõi
+## 3.3 Cài đặt các thành phần lõi <a name="3.3"> </a> 
 
-### 3.3.1 Cài đặt và cấu hình Nova
+### 3.3.1 Cài đặt và cấu hình Nova <a name="3.3.1"> </a> 
 
  - Cài đặt nova
  
@@ -1204,7 +1231,7 @@ systemctl start libvirtd.service openstack-nova-compute.service
 
 ![ops](/ManhDV/OpenStack/images/nova.png)
 
-### 3.3.2 Cài đặt và cấu hình neutron openvSwitch
+### 3.3.2 Cài đặt và cấu hình Neutron openvSwitch <a name="3.3.2"> </a> 
 
  - Cài đặt neutron openvswitch
  
@@ -1356,7 +1383,7 @@ openstack server create mdt-cirros --image cirros  --flavor m1.tiny --nic net-id
 
 ![ops](/ManhDV/OpenStack/images/test-vm-02.png) 
  
-# 4. Cài đặt mô hình network Self-service
+# 4. Cài đặt mô hình network Self-service <a name="4"> </a> 
 
  - Trên node CTL và COM, tạo thêm bond2. Tạo đường br-vlan để vm có thể kết nối tới router ảo trên CTL.
  
@@ -1375,7 +1402,7 @@ BONDING_OPTS="mode=1 miimon=100"
 NM_CONTROLLED=no
 ```
 
-## 4.1. Thực hiện trên node Controller
+## 4.1. Thực hiện trên node Controller <a name="4.1"> </a> 
 
  - Sửa cấu hình file /etc/neutron/neutron.conf 
  
@@ -1510,7 +1537,7 @@ systemctl restart neutron-metadata-agent.service
 systemctl restart neutron-l3-agent
 ```
 
-## 4.2 Thực hiện trên node Compute
+## 4.2 Thực hiện trên node Compute <a name="4.2"> </a> 
 
  - Sửa file /etc/neutron/plugins/ml2/openvswitch_agent.ini
  
@@ -1577,7 +1604,7 @@ systemctl restart openvswitch.service
 systemctl restart neutron-openvswitch-agent.service 
 ```
 
-## 4.3 Kiểm tra 
+## 4.3 Kiểm tra  <a name="4.3"> </a> 
 
  - Đúng trên CTL, `source admin-rc`, sau đó kiểm tra neutron
  
@@ -1586,7 +1613,7 @@ systemctl restart neutron-openvswitch-agent.service
 ![ops](/ManhDV/OpenStack/images/neutron-agent-list.png)
 
 
-# 5. Tạo máy ảo theo kiểu Self-service
+# 5. Tạo máy ảo theo dạng Self-service <a name="5"> </a> 
 
  - Tạo network public
  
