@@ -1,4 +1,4 @@
-#Cài đặt và cấu hình dịch vụ Cinder
+# Cài đặt và cấu hình dịch vụ Cinder
 
 # 1. Cài đặt và cấu hình Cinder trên node Controller
 
@@ -11,9 +11,12 @@ GRANT ALL PRIVILEGES ON cinder.* TO 'cinder'@'localhost' \
   IDENTIFIED BY 'Welcome123';
 GRANT ALL PRIVILEGES ON cinder.* TO 'cinder'@'%' \
   IDENTIFIED BY 'Welcome123';
+exit
 ```
 
  - Tạo và phân quyền cho user cinder 
+ 
+`source admin-rc`
  
 `openstack user create cinder --domain default --password Welcome123`
 
@@ -45,7 +48,7 @@ openstack endpoint create --region RegionOne volumev2 admin http://controller:87
 
  - Cài đặt Cinder
  
-`yum install openstack-cinder`
+`yum install -y openstack-cinder`
 
  - Sao lưu file cấu hình
 
@@ -78,11 +81,10 @@ password = Welcome123
 lock_path = /var/lib/cinder/tmp
 ```
 
+ 
  - Đồng bọ database Cinder
  
 `su -s /bin/sh -c "cinder-manage db sync" cinder`
-
-# Cài đặt và cấu hình cinder trên Compute
 
  - Sửa file /etc/nova/nova.conf
  
