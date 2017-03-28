@@ -54,6 +54,8 @@ openstack endpoint create --region RegionOne volumev2 admin http://172.16.69.11:
 
 `cp /etc/cinder/cinder.conf /etc/cinder/cinder.conf.orig`
 
+ - Sửa file cấu hình /etc/cinder/cinder.conf
+
 ```sh
 [DEFAULT]
 rpc_backend = rabbit
@@ -103,7 +105,7 @@ systemctl restart openstack-nova-api.service
 
  - Restart dịch vụ cinder và cho phép khởi động cùng hệ thống :
 
-``sh
+```sh
 systemctl enable openstack-cinder-api.service openstack-cinder-scheduler.service
 systemctl start openstack-cinder-api.service openstack-cinder-scheduler.service
 ```
