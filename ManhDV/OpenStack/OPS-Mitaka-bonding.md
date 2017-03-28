@@ -1,6 +1,33 @@
-# Hướng dẫn cài đặt OpenStack trên Mitaka với mô hình Openvswitch
+# Hướng dẫn cài đặt OpenStack Mitaka sử dụng Openvswitch : mix network Provider và Self-service (Bonding)
 
-# 1. Chuẩn bị
+# Mục lục
+ *	[1. Chuẩn bị](#1)
+ *	[2. Cài đặt trên node Controller](#2)
+	*	[2.1. Setup môi trường cài đặt](#2.1)
+	*	[2.2. Cài đặt các thành phần phụ trợ](#2.2)	
+		*	[2.2.1. Cài đặt NTP](#2.2.1)
+		*	[2.2.2. Cài đặt và cấu hình database MySQL](#2.2.2)
+		*	[2.2.3 Cài đặt và cấu hình RabbitMQ](#2.2.3)
+		*	[2.2.4 Cài đặt và cấu hình Memcache](#2.2.4)
+	*	[2.3. Cài đặt các thành phân lõi](#2.3)
+		*	[2.3.1 Cài đặt và cấu hình Keystone](#2.3.1)
+		*	[2.3.2 Cài đặt và cấu hình Glance](#2.3.2)
+		*	[2.3.3 Cài đặt Nova](#2.3.3)
+		*	[2.3.4 Cài đặt Neutron (OpenvSwitch)](#2.3.4)
+		*	[2.3.5 Cài đặt và cấu hình Horizon](#2.3.5)
+*	[3 Cài đặt trên Compute](#3)
+	*	[3.1 Setup môi trường cài đặt](#3.1)
+	*	[3.2 Cài đặt các thành phần phụ trợ](#3.2)
+		*	[3.2.1 Cài đặt NTP](#3.2.1)
+	*	[3.3 Cài đặt các thành phần lõi](#3.3)
+		*	[3.3.1 Cài đặt và cấu hình Nova](#3.3.1)
+		*	[3.3.2 Cài đặt và cấu hình Neutron openvSwitch](#3.3.2)
+*	[4. Cài đặt mô hình network Self-service](#4)
+	*	[4.1. Thực hiện trên node Controller](#4.1)
+	*	[4.2 Thực hiện trên node Compute](#4.2)
+	*	[4.3 Kiểm tra](#4.3)
+*	[5. Tạo máy ảo theo dạng Self-service](#5)
+# 1. Chuẩn bị <a name="1"> </a> 
 
  -	Distro : RHEL 7 đã register
 
@@ -14,9 +41,13 @@
 
 **Chú ý** : Tên card mạng và bond có thể thay đổi
 
-# 2. Setup môi trường cài đặt (Trên cả CTL và COM)
+# 2. Cài đặt trên CTL <a name="2"> </a> 
 
- -	Cấu hình file host
+## 2.1 Setup môi trường cài đặt <a name="2.1"> </a> 
+
+ - Setup bonding cho node CTL. Tham khảo link [sau](https://github.com/meditechopen/mdt-technical/blob/master/ManhDV/OpenStack/Caidat-bonding.md)
+ 
+ - Cấu hình file hosts
  
 `vi /etc/hosts`
  
@@ -76,6 +107,10 @@ sed -i 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/selinux/config
  
 `yum install -y http://dl.fedoraproject.org/pub/epel/7/x86_64/b/byobu-5.73-4.el7.noarch.rpm wget`
 
+ - Chạy lệnh byobu
+ 
+`byobu`
+
  - Cài đặt openstack-client để sử dụng các câu lệnh openstack
  
 `yum install python-openstackclient -y`
@@ -84,16 +119,17 @@ sed -i 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/selinux/config
  
 `yum install openstack-selinux -y`
 
-## 2.1 Cài đặt và cấu hình dịch vụ đồng bộ thời gian NTP
 
- - Cài đặt NTP
+## 2.2 Cài đặt các thành phần phụ trợ <a name="2.2"> </a> 
+
+### 2.2.1 Cài đặt NTP <a name="2.2.1"> </a> 
  
 `yum install chrony -y `
 
  - Chỉnh sửa file cấu hình /etc/chrony/chrony.conf
  
 ```sh
-sed -i "s/server 0.rhel.pool.ntp.org iburst/server 172.16.69.11 iburst/g" /etc/chrony.conf
+sed -i "s/server 0.rhel.pool.ntp.org iburst/server vn.pool.ntp.org iburst/g" /etc/chrony.conf
 
 sed -i 's/server 1.rhel.pool.ntp.org iburst/#server 1.rhel.pool.ntp.org iburst/g' /etc/chrony.conf
 
@@ -114,10 +150,9 @@ systemctl start chronyd.service
  
 `chronyc sources`
 
-![ops](/ManhDV/OpenStack/images/ntp.png)
+![ops](/ManhDV/OpenStack/images/chrony-ctl.png)
 
-# 3. Cài đặt trên node Controller
-## 3.1 Cài đặt và cấu hình database MySQL
+### 2.2.2 Cài đặt và cấu hình database MySQL <a name="2.2.2"> </a> 
 
  - Cài đặt database MySQL
 
@@ -161,7 +196,7 @@ Remove test database and access to it? [Y/n]: y
 Reload privilege tables now? [Y/n]: y
 ```
 
-## 3.2 Cài đặt và cấu hình RabbitMQ
+### 2.2.3 Cài đặt và cấu hình RabbitMQ <a name="2.2.3"> </a> 
 
  - Cài đặt rabbitmq
  
@@ -182,7 +217,7 @@ systemctl start rabbitmq-server.service
 
 `rabbitmqctl set_permissions openstack ".*" ".*" ".*"`
 
-## 3.3. Cài đặt và cấu hình Memcache
+### 2.2.4 Cài đặt và cấu hình Memcache <a name="2.2.4"> </a> 
 
  - Cài đặt memcache
  
@@ -203,7 +238,9 @@ systemctl enable memcached.service
 systemctl start memcached.service
 ```
 
-## 3.4 Cài đặt và cấu hình Keystone
+## 2.3. Cài đặt các thành phân lõi <a name="2.3"> </a> 
+
+## 2.3.1 Cài đặt và cấu hình Keystone <a name="2.3.1"> </a> 
 
  - Tạo database cho keystone
  
@@ -441,7 +478,7 @@ export OS_IMAGE_API_VERSION=2
 
 `openstack token issue`
 
-## 3.5. Cài đặt và cấu hình Glance
+## 2.3.2 Cài đặt và cấu hình Glance <a name="2.3.2"> </a> 
 
  - Tạo database cho Glance
  
@@ -570,7 +607,7 @@ openstack image create "cirros" \
  
 `openstack image list `
 
-## 3.6 Cài đặt Nova
+## 2.3.3 Cài đặt Nova <a name="2.3.3"> </a> 
 
  - Tạo database cho Nova
  
@@ -687,7 +724,7 @@ systemctl start openstack-nova-api.service \
   openstack-nova-conductor.service openstack-nova-novncproxy.service  
 ```
 
-## 3.7 Cài đặt Neutron (Theo dạng network OpenvSwitch)
+## 2.3.4 Cài đặt Neutron (Theo dạng network OpenvSwitch) <a name="2.3.4"> </a> 
 
  - Tạo database cho neutron
  
@@ -944,7 +981,7 @@ systemctl start neutron-metadata-agent.service
 
 ![ops](/ManhDV/OpenStack/images/neutron.png)
 
-## 3.8 Cài đặt và cấu hìnhHorizon
+## 2.3.5 Cài đặt và cấu hình Horizon <a name="2.3.5"> </a> 
 
  - Cài đặt horizon
 
@@ -1003,9 +1040,118 @@ OPENSTACK_NEUTRON_NETWORK = {
 `systemctl restart httpd.service memcached.service`
 
 
-# 4. Cài đặt trên Compute
+# 3 Cài đặt trên Compute  <a name="3"> </a> 
 
-## 4.1. Cài đặt và cấu hình Nova
+## 3.1 Setup môi trường cài đặt <a name="3.1"> </a> 
+
+ - Setup bonding cho node COM. Tham khảo link [sau](https://github.com/meditechopen/mdt-technical/blob/master/ManhDV/OpenStack/Caidat-bonding.md)
+ 
+ - Cấu hình file hosts
+ 
+`vi /etc/hosts`
+ 
+```sh
+127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4
+::1         localhost localhost.localdomain localhost6 localhost6.localdomain6
+172.16.69.11    ctl02
+172.16.69.21    com02
+```
+
+`vi /etc/resolv.conf`
+
+```sh
+nameserver 8.8.8.8
+```
+
+ - Kiểm tra ping ra Internet
+ 
+`ping google.com`
+
+ - Config cho các module network
+ 
+```sh
+echo "net.ipv4.ip_forward=1" >> /etc/sysctl.conf
+echo "net.ipv4.conf.all.rp_filter=0" >> /etc/sysctl.conf
+echo "net.ipv4.conf.default.rp_filter=0" >> /etc/sysctl.conf
+sysctl -p
+```
+
+ - Đăng ký tài khoản RHEL (Người dùng đã phải đăng ký bằng mail trên website của RHEL)
+ 
+```sh
+subscription-manager register --username="user" --password="userpassword" --auto-attach
+
+subscription-manager repos --enable=rhel-7-server-optional-rpms --enable=rhel-7-server-extras-rpms --enable=rhel-7-server-rh-common-rpms
+```
+
+ - Tắt firewall và selinux
+```sh
+systemctl disable firewalld
+systemctl stop firewalld
+sed -i 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/selinux/config
+```
+
+ - Khởi động lại máy
+ 
+`init 6`
+
+
+ -  Add repo và update hệ thống
+
+`yum install -y https://repos.fedorapeople.org/repos/openstack/openstack-mitaka/rdo-release-mitaka-6.noarch.rpm`
+
+`yum upgrade -y`
+
+ - Cài đặt byobu và wget 
+ 
+`yum install -y http://dl.fedoraproject.org/pub/epel/7/x86_64/b/byobu-5.73-4.el7.noarch.rpm wget`
+
+ - Chạy lệnh byobu
+ 
+`byobu`
+
+ - Cài đặt openstack-client để sử dụng các câu lệnh openstack
+ 
+`yum install python-openstackclient -y`
+
+ - Cài đặt gói openstack-selinux để quản lý policy cho các service openstack.
+ 
+`yum install openstack-selinux -y`
+
+## 3.2 Cài đặt các thành phần phụ trợ <a name="3.2"> </a> 
+
+### 3.2.1 Cài đặt NTP <a name="3.2.1"> </a> 
+ 
+`yum install chrony -y `
+
+ - Chỉnh sửa file cấu hình /etc/chrony/chrony.conf
+ 
+```sh
+sed -i "s/server 0.rhel.pool.ntp.org iburst/server 172.16.69.11 iburst/g" /etc/chrony.conf
+
+sed -i 's/server 1.rhel.pool.ntp.org iburst/#server 1.rhel.pool.ntp.org iburst/g' /etc/chrony.conf
+
+sed -i 's/server 2.rhel.pool.ntp.org iburst/#server 2.rhel.pool.ntp.org iburst/g' /etc/chrony.conf
+
+sed -i 's/server 3.rhel.pool.ntp.org iburst/#server 3.rhel.pool.ntp.org iburst/g' /etc/chrony.conf
+
+```
+ - Restart dịch vụ ntp
+ 
+```sh
+systemctl enable chronyd.service
+systemctl start chronyd.service
+```
+ - Chạy lệnh kiểm tra trên COM
+ 
+`chronyc sources`
+
+![ops](/ManhDV/OpenStack/images/ntp.png)
+
+
+## 3.3 Cài đặt các thành phần lõi <a name="3.3"> </a> 
+
+### 3.3.1 Cài đặt và cấu hình Nova <a name="3.3.1"> </a> 
 
  - Cài đặt nova
  
@@ -1085,7 +1231,7 @@ systemctl start libvirtd.service openstack-nova-compute.service
 
 ![ops](/ManhDV/OpenStack/images/nova.png)
 
-## 4.2. Cài đặt và cấu hình neutron openvSwitch
+### 3.3.2 Cài đặt và cấu hình Neutron openvSwitch <a name="3.3.2"> </a> 
 
  - Cài đặt neutron openvswitch
  
@@ -1219,14 +1365,47 @@ TYPE=OVSBridge
  
 `. admin-rc`
 
-`openstack network agent list`
+`neutron agent-list`
 
-# 5. Cài đặt mô hình network Self-service
+ - Tạo máy ảo với image cirros, flavor tiny và dải mạng external_network. Quay lại node CTL.
+ 
+`. admin-rc`
+ 
+```sh
+openstack server create mdt-cirros --image cirros  --flavor m1.tiny --nic net-id=external_network
+```
 
+ - Setup **Default rules` cho các vm
+ 
+![ops](/ManhDV/OpenStack/images/default-rule.png) 
+ 
+ - Kiểm tra trên dashboard, đăng nhập và kiểm tra PING và SSH vào máy đã tạo.
+ 
+![ops](/ManhDV/OpenStack/images/test-vm-01.png) 
 
- - Tắt 2 máy CTL và COM, sau đó add thêm card VMnet2 cho cả 2 máy. Xuất hiện card ens39 thuộc VMnet2.
+![ops](/ManhDV/OpenStack/images/test-vm-02.png) 
+ 
+# 4 Cài đặt mô hình network Self-service <a name="4"> </a> 
 
-## 5.1. Thực hiện trên node Controller
+ - Trên node CTL và COM, tạo thêm bond2. Tạo đường br-vlan để vm có thể kết nối tới router ảo trên CTL.
+ 
+ - Add thêm 2 card mạng trên VMnet2. Tạo bond2 từ 2 card này. Tham khảo cách tạo bond ở link [sau](https://github.com/meditechopen/mdt-technical/blob/master/ManhDV/OpenStack/Caidat-bonding.md)
+
+ - Cấu hình card bond2 như sau :
+ 
+```sh
+DEVICE=bond2
+TYPE=Bond
+NAME=bond2
+BONDING_MASTER=yes
+BOOTPROTO=none
+ONBOOT=yes
+BONDING_OPTS="mode=1 miimon=100"
+NM_CONTROLLED=no
+```
+
+## 4.1. Thực hiện trên node Controller <a name="4.1"> </a> 
+
  - Sửa cấu hình file /etc/neutron/neutron.conf 
  
 ```sh
@@ -1314,22 +1493,25 @@ dhcp-option-force=26,1450
 
  - Gán interface vlan vào OVS br-vlan
  
-`ovs-vsctl add-port br-vlan ens39`
+`ovs-vsctl add-port br-vlan bond2`
 
- - Sao lưu file cấu hình ifcfg-ens39
+ - Sao lưu file cấu hình ifcfg-bond2
  
-`cp /etc/sysconfig/network-scripts/ifcfg-ens39 /etc/sysconfig/network-scripts/ifcfg-ens39.bka`
+`cp /etc/sysconfig/network-scripts/ifcfg-bond2 /etc/sysconfig/network-scripts/ifcfg-bond2.bka`
 
- - Tạo file cấu hình /etc/sysconfig/network-scripts/ifcfg-ens39 mới
+ - Tạo file cấu hình /etc/sysconfig/network-scripts/ifcfg-bond2 mới
  
 ```sh
-DEVICE=ens39
-NAME=ens39
+DEVICE=bond2
+NAME=bond2
 DEVICETYPE=ovs
 TYPE=OVSPort
 OVS_BRIDGE=br-vlan
 ONBOOT=yes
 BOOTPROTO=none
+BONDING_MASTER=yes
+BONDING_OPTS="mode=1 miimon=100"
+NM_CONTROLLED=no
 ```
 
  - Tạo file cấu hình /etc/sysconfig/network-scripts/ifcfg-br-vlan mới
@@ -1357,7 +1539,7 @@ systemctl restart neutron-metadata-agent.service
 systemctl restart neutron-l3-agent
 ```
 
-## 5.2 Thực hiện trên node Compute
+## 4.2 Thực hiện trên node Compute <a name="4.2"> </a> 
 
  - Sửa file /etc/neutron/plugins/ml2/openvswitch_agent.ini
  
@@ -1382,22 +1564,25 @@ enable_security_group = True
 
  - Gán interface vlan vào OVS br-vlan
  
-`ovs-vsctl add-port br-vlan ens39`
+`ovs-vsctl add-port br-vlan bond2`
 
- - Sao lưu file cấu hình ifcfg-ens39
+ - Sao lưu file cấu hình ifcfg-bond2
  
-`cp /etc/sysconfig/network-scripts/ifcfg-ens39 /etc/sysconfig/network-scripts/ifcfg-ens39.bka`
+`cp /etc/sysconfig/network-scripts/ifcfg-bond2 /etc/sysconfig/network-scripts/ifcfg-bond2.bka`
 
- - Tạo file cấu hình /etc/sysconfig/network-scripts/ifcfg-ens39 mới
+ - Tạo file cấu hình /etc/sysconfig/network-scripts/ifcfg-bond2 mới
  
 ```sh
-DEVICE=ens39
-NAME=ens39
+DEVICE=bond2
+NAME=bond2
 DEVICETYPE=ovs
 TYPE=OVSPort
 OVS_BRIDGE=br-vlan
 ONBOOT=yes
 BOOTPROTO=none
+BONDING_MASTER=yes
+BONDING_OPTS="mode=1 miimon=100"
+NM_CONTROLLED=no
 ```
 
  - Tạo file cấu hình /etc/sysconfig/network-scripts/ifcfg-br-vlan mới
@@ -1421,7 +1606,7 @@ systemctl restart openvswitch.service
 systemctl restart neutron-openvswitch-agent.service 
 ```
 
-## 5.3 Kiểm tra 
+## 4.3 Kiểm tra  <a name="4.3"> </a> 
 
  - Đúng trên CTL, `source admin-rc`, sau đó kiểm tra neutron
  
@@ -1430,7 +1615,7 @@ systemctl restart neutron-openvswitch-agent.service
 ![ops](/ManhDV/OpenStack/images/neutron-agent-list.png)
 
 
-# 5. Tạo máy ảo
+# 5. Tạo máy ảo theo dạng Self-service <a name="5"> </a> 
 
  - Tạo network public
  
