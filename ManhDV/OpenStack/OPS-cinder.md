@@ -33,17 +33,17 @@ openstack service create --name cinderv2 --description "OpenStack Block Storage"
  - Tạo service API endpoint
  
 ```sh
-openstack endpoint create --region RegionOne volume public http://controller:8776/v1/%\(tenant_id\)s
+openstack endpoint create --region RegionOne volume public http://172.16.69.11:8776/v1/%\(tenant_id\)s
   
-openstack endpoint create --region RegionOne volume internal http://controller:8776/v1/%\(tenant_id\)s
+openstack endpoint create --region RegionOne volume internal http://172.16.69.11:8776/v1/%\(tenant_id\)s
 
-openstack endpoint create --region RegionOne volume admin http://controller:8776/v1/%\(tenant_id\)s
+openstack endpoint create --region RegionOne volume admin http://172.16.69.11:8776/v1/%\(tenant_id\)s
 
-openstack endpoint create --region RegionOne volumev2 public http://controller:8776/v2/%\(tenant_id\)s
+openstack endpoint create --region RegionOne volumev2 public http://172.16.69.11:8776/v2/%\(tenant_id\)s
 
-openstack endpoint create --region RegionOne volumev2 internal http://controller:8776/v2/%\(tenant_id\)s
+openstack endpoint create --region RegionOne volumev2 internal http://172.16.69.11:8776/v2/%\(tenant_id\)s
 
-openstack endpoint create --region RegionOne volumev2 admin http://controller:8776/v2/%\(tenant_id\)s
+openstack endpoint create --region RegionOne volumev2 admin http://172.16.69.11:8776/v2/%\(tenant_id\)s
 ```
 
  - Cài đặt Cinder
@@ -61,17 +61,17 @@ auth_strategy = keystone
 my_ip = 172.16.69.11
 
 [database]
-connection = mysql+pymysql://cinder:Welcome123@controller/cinder
+connection = mysql+pymysql://cinder:Welcome123@172.16.69.11/cinder
 
 [oslo_messaging_rabbit]
-rabbit_host = controller
+rabbit_host = 172.16.69.11
 rabbit_userid = openstack
 rabbit_password = Welcome123
 
 [keystone_authtoken]
-auth_uri = http://controller:5000
-auth_url = http://controller:35357
-memcached_servers = controller:11211
+auth_uri = http://172.16.69.11:5000
+auth_url = http://172.16.69.11:35357
+memcached_servers = 172.16.69.11:11211
 auth_type = password
 project_domain_name = default
 user_domain_name = default
@@ -152,17 +152,17 @@ enabled_backends = lvm
 glance_api_servers = http://172.16.69.11:9292
 
 [oslo_messaging_rabbit]
-rabbit_host = controller
+rabbit_host = 172.16.69.11
 rabbit_userid = openstack
 rabbit_password = Welcome123
 
 [database]
-connection = mysql+pymysql://cinder:Welcome123@controller/cinder
+connection = mysql+pymysql://cinder:Welcome123@172.16.69.11/cinder
 
 [keystone_authtoken]
-auth_uri = http://controller:5000
-auth_url = http://controller:35357
-memcached_servers = controller:11211
+auth_uri = http://172.16.69.11:5000
+auth_url = http://172.16.69.11:35357
+memcached_servers = 172.16.69.11:11211
 auth_type = password
 project_domain_name = default
 user_domain_name = default
