@@ -55,11 +55,13 @@ openstack endpoint create --region RegionOne volumev2 admin http://controller:87
 `cp /etc/cinder/cinder.conf /etc/cinder/cinder.conf.orig`
 
 ```sh
-[database]
-connection = mysql+pymysql://cinder:Welcome123@controller/cinder
+[DEFAULT]
 rpc_backend = rabbit
 auth_strategy = keystone
 my_ip = 172.16.69.11
+
+[database]
+connection = mysql+pymysql://cinder:Welcome123@controller/cinder
 
 [oslo_messaging_rabbit]
 rabbit_host = controller
