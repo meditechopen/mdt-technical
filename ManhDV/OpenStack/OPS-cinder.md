@@ -145,6 +145,10 @@ filter = [ "a/sda/", "a/sdb/", "r/.*/"]
 
  - Sao lưu file cấu hình cinder /etc/cinder/cinder.conf 
  
+`cp /etc/cinder/cinder.conf /etc/cinder/cinder.conf.orig`
+
+ - Sửa file cấu hình /etc/cinder/cinder.conf 
+ 
 ```sh
 [DEFAULT]
 rpc_backend = rabbit
@@ -180,6 +184,7 @@ iscsi_helper = lioadm
 
 [oslo_concurrency]
 lock_path = /var/lib/cinder/tmp
+```
 
  - Start dịch vụ cinder-volume và cho phép khởi động cùng hệ thống 
  
