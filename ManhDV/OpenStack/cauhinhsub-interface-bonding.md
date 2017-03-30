@@ -1,17 +1,17 @@
 # Tài liệu hướng dẫn cấu hình Sub-interface VLAN trên Bonding
 
-# 1. Sub-interface VLAN là gì?
+## 1. Sub-interface VLAN là gì?
 
 **Sub-interface** là các interface ảo, được tạo ra bằng cách chia một interface vật lý (physical-interface) thành các logical interface. Mỗi sub-interface sẽ được gán vào một VLAN.
 
-# 2. Hướng dẫn cấu hình sub-interface VLAN trên Linux (RHEL 7)
+## 2. Hướng dẫn cấu hình sub-interface VLAN trên Linux (RHEL 7)
 
 **Chú ý**. Để cấu hình thành công, cần có các điều kiện sau :
 
  -	Switch hỗ trợ chuẩn IEEE 802.1q và đã cấu hình trunk VLAN
  -	NIC hoạt động được với Linux và hỗ trợ chuẩn 802.1q
  
-## 2.1 Cấu hình trên switch
+### 2.1 Cấu hình trên switch
  - Cấu hình trunk vlan trên switch
  
 ```sh
@@ -21,7 +21,7 @@ Switch#(config-if)switchport mode trunk
 Switch#(config-if)switchport trunk allowed vlan 192
 ```
  
-## 2.2 Cấu hình trên server Linux
+### 2.2 Cấu hình trên server Linux
  
  - Load driver 802.1q Linux kernel
  
