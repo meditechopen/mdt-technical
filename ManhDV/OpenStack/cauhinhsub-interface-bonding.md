@@ -131,3 +131,4 @@ PING 192.168.10.99 (192.168.10.99) 56(84) bytes of data.
 rtt min/avg/max/mdev = 0.781/0.879/0.977/0.098 ms
 ```
 
+ - Kết quả như vậy nghĩa là đã cấu hình sub-interface VLAN thành công !
