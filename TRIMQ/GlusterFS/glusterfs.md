@@ -6,7 +6,7 @@
 	- [1.1 Giới thiệu Gluster FS](#11)
 	- [1.2 Thuật ngữ trong Gluster FS](#12)
 	- [1.3 Một số loại volume cơ bản](#13)
-- [2. IP Planing & Topology lab](#2)
+- [2. Các bước chuẩn bị dựng lab GlusterFS](#2)
 	- [2.1 IP Planing](#21)
 	- [2.2 Topology lab](#22)
 - [3. Dựng lab Gluster](#3)
@@ -14,6 +14,7 @@
 	- [3.2 Các bước cấu hình trên client](#32)
 	- [3.3 Kiểm tra khả năng hoạt động của Gluster FS](#33)
 - [4. Khác](#4)
+	- [4.1 ]
 - [5. Tài liệu tham khảo](#5)
 
 -------------------------------------------------------------------------------
@@ -128,19 +129,10 @@ Kết hợp từ replicated và stripe
 <img src="https://camo.githubusercontent.com/eeb943f4fdd10cb979f422035cc3f263dac64488/687474703a2f2f692e696d6775722e636f6d2f6e52696a754a792e706e67">
 
 
-
-
-
-
-
-
-
-
-
 <a name="2"></a>
-## 2. IP Planing & Topology lab
+## 2. Các bước chuẩn bị dựng lab GlusterFS
 
-Sau đây là IP Planing và Topology lab 
+Sau đây là các bước chuẩn bị để dựng bài lab GlusterFS: IP Planing và Topology lab 
 
 <a name="21"></a>
 ### 2.1 IP Planing
@@ -338,10 +330,27 @@ Sau đây tôi sẽ test thử tính năng của gluster
 <img src="http://i.imgur.com/SRj6ue3.png">
 
 
+Như vậy là tôi đã dựng xong bài lab với GlusterFS sử dụng Replicated Volume.
+
+<a name="4"></a>
+## 4. Khác
+
+Với bài hướng dẫn ở trên, tôi đã sử dụng replicated volume. Sau đây sẽ là các cách để tạo các loại volume khác
+
+<a name="41"></a>
+### 4.1 Tạo Distributed volume
+
+Các bước thực hiện và mô hình lab tương tự như trên, đến bước tạo volume ta sử dụng câu lệnh
+
+```sh
+gluster volume create testvol transport tcp 192.168.100.50:/mnt/brick1
+```
 
 
 
-
+<a name="5"></a>
+## 5. Tài liệu tham khảo
+https://github.com/hocchudong/ghichep-glusterFS
 
 
 
