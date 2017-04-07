@@ -69,7 +69,65 @@ Khi sử dụng GlusterFS có thể tạo nhiều loại volume và mỗi loại
 
 #### Distributed volume:
 
-https://camo.githubusercontent.com/c5aa90c4727697e1c57c7c8d34f5613688baca1b/687474703a2f2f692e696d6775722e636f6d2f5a41366438664f2e706e67
+Distributed Volume có những đặc điểm cơ bản sau:
+
+Dữ liệu được lưu trữ phân tán trên từng bricks, file1 nằm trong brick 1, file 2 nằm trong brick 2,...
+
+Vì metadata được lưu trữ trực tiếp trên từng bricks nên không cần thiết phải có một metadata server ở bên ngoài, giúp cho các tổ chức tiết kiệm được tài nguyên.
+
+Ưu điểm: mở rộng được dung lượng store ( dung lượng store bằng tổng dung lượng các brick)
+
+Nhược điểm: nếu 1 trong các brick bị lỗi, dữ liệu trên brick đó sẽ mất
+
+
+<img src="https://camo.githubusercontent.com/c5aa90c4727697e1c57c7c8d34f5613688baca1b/687474703a2f2f692e696d6775722e636f6d2f5a41366438664f2e706e67">
+
+
+#### Replicated volume:
+
+Dữ liệu sẽ được nhân bản đến những brick còn lại, trên tất cả các node và đồng bộ tất cả các nhân bản mới cập nhật.
+
+Đảm bảo tính nhất quán.
+
+Không giới hạn số lượng replicas.
+
+Ưu điểm: phù hợp với hệ thống yêu cầu tính sẵn sàng cao và dự phòng
+
+Nhược điểm: tốn tài nguyên hệ thống
+
+<img src="https://camo.githubusercontent.com/ba8d6de501a20aaa16771da19801d13a5a1448b9/687474703a2f2f692e696d6775722e636f6d2f48396d73424e482e706e67">
+
+#### Stripe volume:
+
+Dữ liệu chia thành những phần khác nhau và lưu trữ ở những brick khác nhau, ( 1 file được chia nhỏ ra trên các brick )
+
+Ưu điểm : phù hợp với những môi trường yêu cầu hiệu năng, đặc biệt truy cập những file lớn.
+
+Nhược điểm: 1 brick bị lỗi volume không thể hoạt động được.
+
+<img src="https://camo.githubusercontent.com/f8cf164c946b6259516e2fa94e22599c1b52f566/687474703a2f2f692e696d6775722e636f6d2f6e50496e59656e2e706e67">
+
+#### Distributed replicated:
+
+Kết hợp từ distributed và replicated
+
+<img src="https://camo.githubusercontent.com/9e56b066833920595fcd9fa528cc80e4add1e782/687474703a2f2f692e696d6775722e636f6d2f62454f746753372e706e67">
+
+Với mô hình trên, hệ thống sẽ yêu cầu cần tối thiểu 3 node, vừa có thể mở rộng được dung lượng lưu trữ, vừa tăng tính dự phòng cho hệ thống. Tuy nhiên, nếu đồng thời bị lỗi 2 node server1 và server2 hoặc 2 node server3 và server4 thì hệ thống sẽ không hoạt động được.
+
+#### Distributed stripe volume:
+
+Kết hợp từ Distributed và stripe. Do đó nó có hầu hết những thuộc tính hai loại trên và khi 1 node và 1 brick delete đồng nghĩa volume cũng không thể hoạt động được nữa.
+
+<img src="https://camo.githubusercontent.com/7fab4d577e6547eb90d95ca0e0093cdbe2a50b82/687474703a2f2f692e696d6775722e636f6d2f765236463761322e706e67">
+
+#### Replicated stripe volume
+
+Kết hợp từ replicated và stripe
+
+<img src="https://camo.githubusercontent.com/eeb943f4fdd10cb979f422035cc3f263dac64488/687474703a2f2f692e696d6775722e636f6d2f6e52696a754a792e706e67">
+
+
 
 
 
