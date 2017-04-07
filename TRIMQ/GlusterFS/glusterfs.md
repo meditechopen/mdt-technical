@@ -14,7 +14,7 @@
 	- [3.2 Các bước cấu hình trên client](#32)
 	- [3.3 Kiểm tra khả năng hoạt động của Gluster FS](#33)
 - [4. Khác](#4)
-	- [4.1 Tạo Distributed volume ]
+	- [4.1 Tạo Distributed volume ](#41)
 - [5. Tài liệu tham khảo](#5)
 
 -------------------------------------------------------------------------------
