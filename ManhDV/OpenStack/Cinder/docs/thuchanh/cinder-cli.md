@@ -50,7 +50,7 @@ Các bước dưới đây để kiểm chứng việc dữ liệu trên non-boo
  
 `cinder create --display-name vl1 10`
 
-![cinder](/ManhDV/Openstack/Cinder/images/volume-create.png)
+![cinder](/mdt-technical/ManhDV/Openstack/Cinder/images/volume-create.png)
 
 
 **Chú ý** : Tham khảo link [sau](https://docs.openstack.org/admin-guide/dashboard-manage-volumes.html) để tạo volume_type
@@ -59,7 +59,7 @@ Các bước dưới đây để kiểm chứng việc dữ liệu trên non-boo
  
 `cinder list`
 
-![cinder](/ManhDV/Openstack/Cinder/images/cinder-list.png)
+![cinder](/mdt-technical/ManhDV/Openstack/Cinder/images/cinder-list.png)
 
  - Gán volume trạng thái **Available** vào máy ảo như một ổ cứng bên ngoài
  
@@ -129,10 +129,10 @@ Volume snapshot khác với volume backup. Backup copy taofn bộ volume đượ
  
 `cinder list` 
 
-+--------------------------------------+-----------+-----------+------+-------------+----------+-------------+
+|--------------------------------------|-----------|-----------|------|-------------|----------|-------------|
 |                  ID                  |   Status  |    Name   | Size | Volume Type | Bootable | Attached to |
 | 6742baf4-3ae6-41e2-b7bc-fddaeb385370 | available | my-volume |  10  |     lvm     |  false   |             |
-+--------------------------------------+-----------+-----------+------+-------------+----------+-------------+
+
 
  - Tạo snapshot từ volume
  
