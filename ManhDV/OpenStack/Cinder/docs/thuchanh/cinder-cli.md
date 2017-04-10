@@ -50,7 +50,7 @@ Các bước dưới đây để kiểm chứng việc dữ liệu trên non-boo
  
 `cinder create --display-name vl1 10`
 
-![cinder](/ManhDV/Openstack/Cinder/images/volume-create.png)
+![cinder1](/ManhDV/OpenStack/Cinder/images/volume-create.png)
 
 
 **Chú ý** : Tham khảo link [sau](https://docs.openstack.org/admin-guide/dashboard-manage-volumes.html) để tạo volume_type
@@ -59,7 +59,7 @@ Các bước dưới đây để kiểm chứng việc dữ liệu trên non-boo
  
 `cinder list`
 
-![cinder](/ManhDV/Openstack/Cinder/images/cinder-list.png)
+![cinder1](/ManhDV/OpenStack/Cinder/images/cinder-list.png)
 
  - Gán volume trạng thái **Available** vào máy ảo như một ổ cứng bên ngoài
  
@@ -129,8 +129,9 @@ Volume snapshot khác với volume backup. Backup copy taofn bộ volume đượ
  
 `cinder list` 
 
-|--------------------------------------|-----------|-----------|------|-------------|----------|-------------|
+
 |                  ID                  |   Status  |    Name   | Size | Volume Type | Bootable | Attached to |
+|--------------------------------------|-----------|-----------|------|-------------|----------|-------------|
 | 6742baf4-3ae6-41e2-b7bc-fddaeb385370 | available | my-volume |  10  |     lvm     |  false   |             |
 
 
@@ -138,9 +139,9 @@ Volume snapshot khác với volume backup. Backup copy taofn bộ volume đượ
  
 `cinder snapshot-create my-volume --name snap1`
 
-+-------------+--------------------------------------+
+
 |   Property  |                Value                 |
-+-------------+--------------------------------------+
+|-------------|--------------------------------------|
 |  created_at |      2017-04-05T04:38:04.308547      |
 | description |                 None                 |
 |      id     | 1be3814f-ecd2-4010-86c6-040b2ef15fa4 |
@@ -150,16 +151,16 @@ Volume snapshot khác với volume backup. Backup copy taofn bộ volume đượ
 |    status   |               creating               |
 |  updated_at |                 None                 |
 |  volume_id  | 6742baf4-3ae6-41e2-b7bc-fddaeb385370 |
-+-------------+--------------------------------------+
+
 
  - Kiểm tra trạng thái các snapshot đã tạo
  
 `cinder snapshot-list`
 
-+--------------------------------------+--------------------------------------+-----------+-------+------+
 |                  ID                  |              Volume ID               |   Status  |  Name | Size |
+|--------------------------------------|-----------|-----------|------|-------------|----------|---------|
 | 1be3814f-ecd2-4010-86c6-040b2ef15fa4 | 6742baf4-3ae6-41e2-b7bc-fddaeb385370 | available | snap1 |  10  |
-+--------------------------------------+--------------------------------------+-----------+-------+------+
+
 
 ### 1.4 Migrate Voluem
 
