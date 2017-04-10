@@ -157,8 +157,8 @@ Volume snapshot khác với volume backup. Backup copy taofn bộ volume đượ
  
 `cinder snapshot-list`
 
-|                  ID                  |              Volume ID               |   Status  |  Name | Size |
-|--------------------------------------|-----------|-----------|------|-------------|----------|---------|
+|                  ID                  |              Volume ID             |   Status  |  Name | Size |
+|--------------------------------------|------------------------------------|-----------|-------|------|
 | 1be3814f-ecd2-4010-86c6-040b2ef15fa4 | 6742baf4-3ae6-41e2-b7bc-fddaeb385370 | available | snap1 |  10  |
 
 
