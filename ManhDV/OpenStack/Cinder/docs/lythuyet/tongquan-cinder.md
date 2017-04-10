@@ -1,15 +1,24 @@
-# Tổng quan về project Cinder
+# Mục lục
+ *	[1 Giới thiệu tổng quan về project Cinder](#1)
+ *	[2 Kiến trúc và cơ chế hoạt động của Cinder](#2)
+	*	[2.1 Kiến trúc của Cinder](#2.1)
+	*	[2.2 Các thành phần có trong Cinder](#2.2)
+	*	[2.3 Luồng làm việc của Cinder khi Attach Volume](#2.3)
+	*	[2.4 Các phương thức boot máy ảo (từ góc nhìn đối với Cinder)](#2.4)
+	*	[2.5 Điểm khác nhau giữa Ephemeral và Volume boot disk](#2.5)
+		*	[2.5.1. Ephemeral Boot Disk](#2.5.1)
+		*	[2.5.2 Volume Boot Disk](#2.5.2)
 
-# 1. Giới thiệu
+# 1. Giới thiệu tổng quan về project Cinder < a name "1"> </a>
 
 
 Cinder là dịch vụ Block Storage trong Openstack. Nó được thiết kế để người dùng cuối có thể thực hiện việc lưu trữ bởi Nova, việc này được thực hiện bởi LVM hoặc các plugin driver cho các nền tảng lưu trữ khác. Cinder ảo hóa việc quản lý các thiết bị block storage và cung cấp cho người dùng cuối một API đáp ứng được nhu cầu tự phục vụ cũng như tiêu thụ các tài nguyên đó mà không cần biết quá nhiều kiến thức chuyên sâu.
 
-# 2. Kiến trúc và cơ chế hoạt động của Cinder
+# 2. Kiến trúc và cơ chế hoạt động của Cinder < a name "2"> </a>
 
-## 2.1. Kiến trúc của Cinder
+## 2.1. Kiến trúc của Cinder < a name "2.1"> </a>
 
-![cinder](/ManhDV/Openstack/Cinder/images/cinder-achitecture.png)
+![cinder](/ManhDV/OpenStack/Cinder/images/cinder-achitecture.png)
 
 
  - cinder-api : Xác thực và định tuyến các yêu cầu xuyên suốt dịch vụ Cinder. 
@@ -27,7 +36,7 @@ Cinder là dịch vụ Block Storage trong Openstack. Nó được thiết kế 
  - SQL DB : Cung cấp một phương tiện dùng để back up dữ liệu từ Swift/Celp, etc,....
 
  
-## 2.2. Các thành phần có trong Cinder
+## 2.2. Các thành phần có trong Cinder < a name "2.2"> </a>
 
  - Back-end Storage Device : Dịch vụ Block Storage yêu cầu một vài kiểu của back-end storage mà dịch vụ có thể chạy trên đó. Mặc định là sử dụng LVM trên một local volume group tên là "cinder-volumes"
  
@@ -40,7 +49,7 @@ Cinder là dịch vụ Block Storage trong Openstack. Nó được thiết kế 
 	
 	- Backup : Một bản copy lưu trữ của một volume thông thường được lưu ở Swift.
 
-## 2.3 Luồng làm việc của Cinder khi Attach Volume
+## 2.3 Luồng làm việc của Cinder khi Attach Volume < a name "2.3"> </a>
 
 	 - 1. Cinder gọi Cinder qua APi của cinder, truyền thông tin kết nối. Ví vụ : Host name, iSCSI initiator name, FC WWPNs
 	 - 2. Cinder-API chuyển thông điệp đến Cinder-volume. Sau đó trình kiểm tra lỗi đầu vào sẽ làm việc và gọi đến volume driver.
@@ -49,18 +58,42 @@ Cinder là dịch vụ Block Storage trong Openstack. Nó được thiết kế 
 	 - 5. NOVA tạo kết nối đến storage sử dụng thông tin được trả về.
 	 - 6. NOVA chuyển volume device/file tới hypervisor.
 	 
-## 2.4 Các phương thức boot máy ảo (từ góc nhìn đối với Cinder)
+## 2.4 Các phương thức boot máy ảo (từ góc nhìn đối với Cinder) < a name "2.4"> </a>
 
 Trong Openstack, có các cách khác nhau để tạo máy ảo là : 
+
 	- Image : Tạo một ephameral disk từ image đã chọn
+	
 	- Volume : Boot máy ảo từ một bootable volume đã có sẵn
+	
 	- Image (tạo một volume mới) : Tạo một bootable volume mới từ image đã chọn và boot mấy ảo từ đó.
+	
 	- Volume snapshot (tạo một volume mới) : Tạo một volume từ volume snapshot đã chọn và boot máy ảo từ đó/
 	
-## 2.5 Điểm khác nhau giữa Ephemeral và Volume boot disk
+## 2.5 Điểm khác nhau giữa Ephemeral và Volume boot disk < a name "2.5"> </a>
 
-### 2.5.1. Ephemeral Boot Disk
+### 2.5.1. Ephemeral Boot Disk < a name "2.5.1"> </a>
 
 Ephemeral disk là disk ảo mà được tạo cho mục đích boot một máy ảo và nên được coi là nhất thời.
 
 Ephemeral disk hữu dụng trong trường hợp bạn không lo lắng về nhu cầu nhân đôi một máy ảo hoặc hủy một máy ảo và dữ liệu trong đó sẽ mất hết. Bạn vẫn có thể mount một volume trên một máy ảo được boot từ một ephemeral disk và đẩy bất kỳ data nào cần thiết để lưu lại trong volume.
+
+Một số đặc tính :
+
+ - Không sử dụng hết volume quota : Nếu bạn có nhiều instance quota, bạn có thể boot chúng từ ephemeral disk ngay cả khi không có nhiều volume quota
+ 
+ - Bị xóa khi vm bị xóa : Dữ liệu trong emphemeral disk sẽ bị mất khi xóa mấy ảo
+
+### 2.5.2 Volume Boot Disk <a name "2.5.2"> </a>
+
+Voume là dạng lưu trữ bền vững hơn ephemeral disk và có thể dùng để boot như là một block device có thể mount được.
+
+Volume boot disk hữu dụng khi bạn cần dupicate một vm hoặc backup chúng bằng cách snapshot, hoặc nếu bạn muốn dùng phương pháp lưu trữ đáng tin cậy hơn là ephemeral disk. Nếu dùng dạng này, cần có đủ quota cho các vm cần boot.
+
+Một số đặc tính : 
+
+ -	Có thể snapshot
+ 
+ - Không bị xóa khi xóa máy ảo : Bạn có thể xóa máy ảo nhưng dữ liệu vẫn còn trong volume
+ 
+ - Sử dụng hết volume quota : volume quota sẽ được sử dụng hết khi dùng tùy chọn này.
