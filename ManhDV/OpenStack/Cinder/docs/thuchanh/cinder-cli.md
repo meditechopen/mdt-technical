@@ -1,13 +1,23 @@
 # Các câu lệnh hay dùng với Cinder (Đối với Cinder sử dụng LVM làm storage backend)
 
-## 1. Tạo volume bằng câu lệnh
+# Mục lục
+
+ *	[1 Tạo volume bằng câu lệnh](#1)
+	*	[1.1 Tạo Bootable-Volume và tạo máy ảo từ bootable-volume](#1.2)
+	*	[1.1 Tạo non-bootable volume, thực hiện gắn và gõ khỏi máy ảo](#1.3)
+ *	[2 Resize volume](#2)
+ *	[3 Volume Snapshot](#3)
+
+
+
+## 1. Tạo volume bằng câu lệnh <a name="1"> </a> 
 
 Trong Openstack, volume được chia thành 2 dạng :
 	
 	- Volume dùng để boot máy ảo (bootable volume)
 	- Volume dùng để gắn vào máy ảo, dùng như một ổ đĩa ngoài (non-booable volume)
 	
-### 1.1 Tạo Bootable-Volume và tạo máy ảo từ bootable-volume
+### 1.1 Tạo Bootable-Volume và tạo máy ảo từ bootable-volume <a name="1.1"> </a> 
 
  - Trước khi tạo bootable-volume, cần có các thông tin sau :
 	- --flavor=ID
@@ -36,7 +46,7 @@ openstack network list
 `openstack server show VM-Name/VM-ID`
 
 
-### 1.2 Tạo non-bootable volume, thực hiện gắn và gõ khỏi máy ảo.
+### 1.2 Tạo non-bootable volume, thực hiện gắn và gõ khỏi máy ảo. <a name="1.2"> </a> 
 
 Các bước dưới đây để kiểm chứng việc dữ liệu trên non-bootable volume sẽ không bị mất khi gắn volume từ máy ảo này sang máy ảo khác.
  
@@ -50,7 +60,7 @@ Các bước dưới đây để kiểm chứng việc dữ liệu trên non-boo
  
 `cinder create --display-name vl1 10`
 
-![cinder](/ManhDV/Openstack/Cinder/volume-create.png)
+![cinder1](/ManhDV/OpenStack/Cinder/images/volume-create.png)
 
 
 **Chú ý** : Tham khảo link [sau](https://docs.openstack.org/admin-guide/dashboard-manage-volumes.html) để tạo volume_type
@@ -59,7 +69,7 @@ Các bước dưới đây để kiểm chứng việc dữ liệu trên non-boo
  
 `cinder list`
 
-![cinder](/ManhDV/Openstack/Cinder/cinder-list.png)
+![cinder1](/ManhDV/OpenStack/Cinder/images/cinder-list.png)
 
  - Gán volume trạng thái **Available** vào máy ảo như một ổ cứng bên ngoài
  
@@ -109,7 +119,7 @@ mount /dev/vdd /test/
 MeditechJSC
 ```
 
-### 1.3 Resize volume
+### 2 Resize volume <a name="2"> </a> 
 
  - Để resize volume, detach volume khỏi server, sau đó resize volume
  
@@ -119,7 +129,7 @@ MeditechJSC
  
 `cinder list`
 
-### 1.4 Volume Snapshot
+### 3 Volume Snapshot <a name="3"> </a> 
 
 Volume snapshot chụp một thời điểm trạng thái của volume. Volume mà có snapshot được tạo từ nó sẽ không thẻ xóa nếu các snapshot vẫn còn tồn tại. Volume phải ở trạng thái **unattach** để có thể tạo snapshot. Để dùng snapshot, một volume mới phải được từ snapshot.
 
@@ -129,19 +139,19 @@ Volume snapshot khác với volume backup. Backup copy taofn bộ volume đượ
  
 `cinder list` 
 
-+--------------------------------------+-----------+-----------+------+-------------+----------+-------------+
+
 |                  ID                  |   Status  |    Name   | Size | Volume Type | Bootable | Attached to |
-+--------------------------------------+-----------+-----------+------+-------------+----------+-------------+
+|--------------------------------------|-----------|-----------|------|-------------|----------|-------------|
 | 6742baf4-3ae6-41e2-b7bc-fddaeb385370 | available | my-volume |  10  |     lvm     |  false   |             |
-+--------------------------------------+-----------+-----------+------+-------------+----------+-------------+
+
 
  - Tạo snapshot từ volume
  
 `cinder snapshot-create my-volume --name snap1`
 
-+-------------+--------------------------------------+
+
 |   Property  |                Value                 |
-+-------------+--------------------------------------+
+|-------------|--------------------------------------|
 |  created_at |      2017-04-05T04:38:04.308547      |
 | description |                 None                 |
 |      id     | 1be3814f-ecd2-4010-86c6-040b2ef15fa4 |
@@ -151,23 +161,22 @@ Volume snapshot khác với volume backup. Backup copy taofn bộ volume đượ
 |    status   |               creating               |
 |  updated_at |                 None                 |
 |  volume_id  | 6742baf4-3ae6-41e2-b7bc-fddaeb385370 |
-+-------------+--------------------------------------+
+
 
  - Kiểm tra trạng thái các snapshot đã tạo
  
 `cinder snapshot-list`
 
-+--------------------------------------+--------------------------------------+-----------+-------+------+
-|                  ID                  |              Volume ID               |   Status  |  Name | Size |
-+--------------------------------------+--------------------------------------+-----------+-------+------+
+|                  ID                  |              Volume ID             |   Status  |  Name | Size |
+|--------------------------------------|------------------------------------|-----------|-------|------|
 | 1be3814f-ecd2-4010-86c6-040b2ef15fa4 | 6742baf4-3ae6-41e2-b7bc-fddaeb385370 | available | snap1 |  10  |
-+--------------------------------------+--------------------------------------+-----------+-------+------+
 
-### 1.4 Migrate Voluem
+
+### 1.5 Migrate Volume
 
 Bổ sung sau
 
-### 1.5 Volume Backup
+### 1.6 Volume Backup
 
 Bổ sung sau
 
