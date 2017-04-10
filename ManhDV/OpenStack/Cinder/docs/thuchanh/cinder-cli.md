@@ -49,12 +49,14 @@ openstack network list
 ### 1.2 Tạo non-bootable volume, thực hiện gắn và gõ khỏi máy ảo. <a name="1.2"> </a> 
 
 Các bước dưới đây để kiểm chứng việc dữ liệu trên non-bootable volume sẽ không bị mất khi gắn volume từ máy ảo này sang máy ảo khác.
+
+**Chú ý** : Thực hiện trên node Controller
  
- - Tạo non-bootable volume
+#### 1.2.1 Tạo non-bootable volume <a name="1.2.1"> </a> 
  
 	- Cú pháp 
  
-`cinder create --display-name --volume-type VOLUME_TYPE VOLUME-NAME VOLUME-SIZE`
+`cinder create --display-name VOLUME-NAME VOLUME-SIZE --volume-type VOLUME_TYPE  `
 
 	- Ví dụ 
  
@@ -65,11 +67,13 @@ Các bước dưới đây để kiểm chứng việc dữ liệu trên non-boo
 
 **Chú ý** : Tham khảo link [sau](https://docs.openstack.org/admin-guide/dashboard-manage-volumes.html) để tạo volume_type
 
- - List ra các volume đã có 
+#### 1.2.2 List ra các volume đã có <a name="1.2.2"> </a> 
  
 `cinder list`
 
 ![cinder1](/ManhDV/OpenStack/Cinder/images/cinder-list.png)
+
+#### 1.2.3 Attach non-bootable volume vào vm
 
  - Gán volume trạng thái **Available** vào máy ảo như một ổ cứng bên ngoài
  
@@ -81,7 +85,7 @@ Các bước dưới đây để kiểm chứng việc dữ liệu trên non-boo
  
  - Ta sẽ attach non-bootable volume vào vm-01 , cóp dữ liệu vào volume.
  
-	- Thực hiện format ổ cứng, mount thư mục và đẩy dữ liệu vào volume
+	- Tại vm được gắn volume, thực hiện format ổ cứng, mount thư mục và đẩy dữ liệu vào volume
 
 ```sh
 mkfs -t ext4 /dev/vdd
@@ -97,11 +101,13 @@ echo "MeditechJSC" > /test/meditech.txt
 MeditechJSC
 ```
 
+#### 1.2.4 Detech volume ra khỏi vm
+
  - Thực hiện umount, detach volume khỏi máy ảo cũ.
 	
 ```sh
 umount /dev/vdd /test/
-nova volume-detach VM-ID VOLUME-ID
+openstack server remove volume  vm-01 lv-01
 ```
 
  - Trên máy ảo mới, tạo thư mục, mount volume.
