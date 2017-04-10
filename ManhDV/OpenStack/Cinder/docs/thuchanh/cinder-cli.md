@@ -50,7 +50,7 @@ Các bước dưới đây để kiểm chứng việc dữ liệu trên non-boo
  
 `cinder create --display-name vl1 10`
 
-![cinder](/mdt-technical/ManhDV/Openstack/Cinder/images/volume-create.png)
+![cinder](/ManhDV/Openstack/Cinder/images/volume-create.png)
 
 
 **Chú ý** : Tham khảo link [sau](https://docs.openstack.org/admin-guide/dashboard-manage-volumes.html) để tạo volume_type
@@ -59,7 +59,7 @@ Các bước dưới đây để kiểm chứng việc dữ liệu trên non-boo
  
 `cinder list`
 
-![cinder](/mdt-technical/ManhDV/Openstack/Cinder/images/cinder-list.png)
+![cinder](/ManhDV/Openstack/Cinder/images/cinder-list.png)
 
  - Gán volume trạng thái **Available** vào máy ảo như một ổ cứng bên ngoài
  
