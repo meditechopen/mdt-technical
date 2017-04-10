@@ -20,6 +20,8 @@
 
 ![cinder1](/ManhDV/OpenStack/Cinder/images/gluster-volume-status.png)
 
+**Tham khảo**
+
  - Câu lệnh xóa volume trên glusterfs
  
 `gluster volume delete volume-name`
@@ -110,6 +112,7 @@ volume_api_class = nova.volume.cinder.API
  -	Thêm biến trong file admin-rc
  
 `echo "export OS_VOLUME_API_VERSION=2" >> ~/admin-rc`
+
 `source admin-rc`
 
  -	Tạo non-bootable volume tới volume-type
