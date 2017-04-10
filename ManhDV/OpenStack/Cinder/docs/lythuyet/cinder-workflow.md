@@ -1,4 +1,10 @@
-# 1 Process Structure.
+# Mục lục 
+
+ *	[1 Thành phần Cinder](#1)
+ *	[2 Workflow của Cinder khi tạo mới volume](#2)
+ *	[3 Workflow của Cinder khi Attach Volume](#3)
+
+# 1 Thành phần Cinder <a name="1"> </a>
 
 - Chúng ta có 4 quy trình tạo nên Cinder Service :
 
@@ -10,7 +16,7 @@
 |Cinder-backup|Xử lý tương tác với các mục tiêu sao có khả năng sao lưu (Ví dụ như OpenStack Object Storage Service - Swift). Khi một máy client yêu cầu sao lưu volume được tạo ra hoặc quản lý.|
 
 
-# 2 Workflow của Cinder khi tạo mới volume
+# 2 Workflow của Cinder khi tạo mới volume <a name="2"> </a>
 
 ![cinder](/ManhDV/OpenStack/Cinder/images/cinder-process-diagram.png)
 
@@ -29,7 +35,7 @@ Hình bên trên mô tả quy trình tạo Volume , tiếp theo chúng ta cùng 
 9. Client nhận được thông tin bao gồm trạng thái của yêu cầu tạo, Volume UUID, ....
 
 
-## 3 Workflow của Cinder khi Attach Volume
+## 3 Workflow của Cinder khi Attach Volume <a name="3"> </a>
 
 ![cinder](/ManhDV/OpenStack/Cinder/images/cinder-process-diagram.png)
 
