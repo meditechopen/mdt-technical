@@ -1,6 +1,15 @@
 # Cinder Volume với Backend là GluterFS
 
-## 1 Chuẩn bị
+# Mục lục 
+
+ *	[1 Chuẩn bị](#1)
+ *	[2 Chuẩn bị hệ thống GlusterFS](#2)
+ *	[3 Cấu hình GlusterFS Backend trên node Cinder](#3)
+ *	[4 Cấu hình GlusterFS Backend trên node Compute](#4)
+ *	[5 Cấu hình GlusterFS Backend trên node Controller](#5)
+ *	[6 Tạo volume và kiểm tra](#6)
+
+## 1 Chuẩn bị <a name="1"> </a>
 
  - Mô hình Lab
 
@@ -10,7 +19,7 @@
 
 ![cinder1](/ManhDV/OpenStack/Cinder/images/ip-plan.png)
 
-## 2 Chuẩn bị hệ thống GlusterFS
+## 2 Chuẩn bị hệ thống GlusterFS <a name="2"> </a>
 
  -	Chuẩn bị 2 máy GlusterFS, tham khảo cài đặt ở link [sau](https://github.com/meditechopen/mdt-technical/blob/master/TRIMQ/GlusterFS/glusterfs.md#33)
  
@@ -26,7 +35,7 @@
  
 `gluster volume delete volume-name`
 
-## 3 Cấu hình GlusterFS Backend trên node Cinder
+## 3 Cấu hình GlusterFS Backend trên node Cinder <a name="3"> </a>
 
  -	Cài đặt GlusterFS Client
  
@@ -66,7 +75,7 @@ systemctl restart openstack-cinder-volume
 
 ![cinder1](/ManhDV/OpenStack/Cinder/images/cinder-mount.png)
 
-## 4 Cấu hình GlusterFS Backend trên node Compute
+## 4 Cấu hình GlusterFS Backend trên node Compute <a name="4"> </a>
 
  -	Cài đặt GlusterFS Client
  
@@ -83,7 +92,7 @@ volume_api_class = nova.volume.cinder.API
 
 `systemctl restart openstack-nova-compute`
 
-## 5 Cấu hình GlusterFS Backend trên node Controller
+## 5 Cấu hình GlusterFS Backend trên node Controller <a name="5"> </a>
 
  -	Tạo volume-type là glusterfs
  
@@ -115,6 +124,7 @@ volume_api_class = nova.volume.cinder.API
 
 `source admin-rc`
 
+## 6 Tạo volume và kiểm tra <a name="6"> </a>
  -	Tạo non-bootable volume tới volume-type
 
 `cinder create --display_name disk01 10 --volume-type glusterfs`
