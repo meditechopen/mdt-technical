@@ -173,8 +173,9 @@ glusterfs_mount_point_base = $state_path/mnt_gluster
 	```sh
 	172.16.69.13:/cinder-vol
 	```
-		-	`172.16.69.13` : IP của GlusterFS Pool. Tham khảo bài [sau](https://github.com/meditechopen/mdt-technical/blob/master/TRIMQ/GlusterFS/glusterfs.md#33) về GlusterFS
-		-	`cinder-vol` : Tên volume đã tạo ở GlusterFS
+	
+	 -	`172.16.69.13` : IP của GlusterFS Pool. Tham khảo bài [sau](https://github.com/meditechopen/mdt-technical/blob/master/TRIMQ/GlusterFS/glusterfs.md#33) về GlusterFS
+	 -	`cinder-vol` : Tên volume đã tạo ở GlusterFS
 
 ### 1.6 Các cấu hình khác <a name="1.6"> </a>
 ```sh
