@@ -122,7 +122,15 @@ Nếu dùng Keystone v3, phải có thêm tùy chọn `--domain`
 
 Một user có thể có nhiều role trong các project khác nhau hoặc có nhiểu role trong cùng một project. File `policy.json` kiểm soát quyền hạn mà user có thể thực hiện được với từng project. Để giới hạn quyền mà user có thể làm với service, cần sửa đổi trong file `policy.json`.
 
-Ví dụ, muốn giới hạn user `manhdv` có thể tạo volume. Thay đổi quyền trong `/etc/cinder/policy.json`
+Ví dụ, muốn giới hạn user `manhdv01` có thể tạo volume. Thay đổi quyền trong `/etc/cinder/policy.json`
 
-`"volume:create": "role:manhdv",
+`"volume:create": "role:manhdv01",
+
+## Log xác thực của keystone
+
+ Các log về xác thực của keystone sẽ được ghi lại trong file log : `/var/log/http/error.log`.
+ 
+Ví dụ : Login với user `manhdv01`, và thực hiện tạo volume. User `manhdv01` đã bị giới hạn quyền tạo volume nên log sẽ báo như sau : 
+
+![keystone](![ops](/ManhDV/OpenStack/images/keystone-log.png)
 
