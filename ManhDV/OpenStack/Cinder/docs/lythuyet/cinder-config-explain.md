@@ -167,13 +167,14 @@ glusterfs_mount_point_base = $state_path/mnt_gluster
  -	`enabled_backends = glusterfs` : Sử dụng backend là Glusterfs
  -	`volume_driver = cinder.volume.drivers.glusterfs.GlusterfsDriver` : Chỉ định driver mà Glusterfs sử dụng
  -	`glusterfs_shares_config = /etc/cinder/glusterfs_shares` : File cấu hình để kết nối tới GlusterFS.
-	-	Nội dung file `glusterfs_shares
+ -	`glusterfs_mount_point_base = $state_path/mnt_gluster` : Mount point tới GlusterFS
+ 
+	-	Nội dung file `glusterfs_shares`
 	```sh
 	172.16.69.13:/cinder-vol
 	```
 		-	`172.16.69.13` : IP của GlusterFS Pool. Tham khảo bài [sau](https://github.com/meditechopen/mdt-technical/blob/master/TRIMQ/GlusterFS/glusterfs.md#33) về GlusterFS
 		-	`cinder-vol` : Tên volume đã tạo ở GlusterFS
- -	`glusterfs_mount_point_base = $state_path/mnt_gluster` : Mount point tới GlusterFS
 
 ### 1.6 Các cấu hình khác <a name="1.6"> </a>
 ```sh
