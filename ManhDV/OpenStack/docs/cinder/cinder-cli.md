@@ -62,7 +62,7 @@ Các bước dưới đây để kiểm chứng việc dữ liệu trên non-boo
  
 `cinder create --display-name vl1 10`
 
-![cinder1](/ManhDV/OpenStack/Cinder/images/volume-create.png)
+![cinder1](/ManhDV/OpenStack/images/volume-create.png)
 
 
 **Chú ý** : Tham khảo link [sau](https://docs.openstack.org/admin-guide/dashboard-manage-volumes.html) để tạo volume_type
@@ -71,7 +71,7 @@ Các bước dưới đây để kiểm chứng việc dữ liệu trên non-boo
  
 `cinder list`
 
-![cinder1](/ManhDV/OpenStack/Cinder/images/cinder-list.png)
+![cinder1](/ManhDV/OpenStack/images/cinder-list.png)
 
 #### 1.2.3 Attach non-bootable volume vào vm
 
