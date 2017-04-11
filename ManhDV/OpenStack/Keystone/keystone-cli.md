@@ -103,7 +103,6 @@
 Nếu dùng Keystone v3, phải có thêm tùy chọn `--domain`
 
  -	Gán role
- 
 `openstack role add --user USER_NAME --project RPOJECT_ID ROLE_NAME`
 
  - Show thông tin về role được gán cho user.
@@ -118,7 +117,7 @@ Nếu dùng Keystone v3, phải có thêm tùy chọn `--domain`
  
 `openstack role list --user USER_NAME --project PROJECT_ID`
 
-## Phân quyền user trong file policy.json
+## 5 Phân quyền user trong file policy.json
 
 Một user có thể có nhiều role trong các project khác nhau hoặc có nhiểu role trong cùng một project. File `policy.json` kiểm soát quyền hạn mà user có thể thực hiện được với từng project. Để giới hạn quyền mà user có thể làm với service, cần sửa đổi trong file `policy.json`.
 
