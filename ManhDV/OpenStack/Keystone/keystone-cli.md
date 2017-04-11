@@ -103,6 +103,7 @@
 Nếu dùng Keystone v3, phải có thêm tùy chọn `--domain`
 
  -	Gán role
+ 
 `openstack role add --user USER_NAME --project RPOJECT_ID ROLE_NAME`
 
  - Show thông tin về role được gán cho user.
