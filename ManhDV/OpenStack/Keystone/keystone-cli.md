@@ -1,6 +1,13 @@
 # Quản lý dịch vụ Identity (Keystone)
 
-## 1 Một số khái niệm 
+ *	[1 Một số khái niệm](#1)
+ *	[2 Quản lý Project ](#2)
+ *	[3 Quản lý user ](#3)
+ *	[4 Quản lý role ](#4)
+ *	[5 Phân quyền user trong file policy.json ](#5)
+ *	[6 Log xác thực của keystone ](#6)
+
+## 1 Một số khái niệm  <a name="1"> </a>
 
  -	Authentication : Quá trình xác thực thông tin user. Để xác thực các yêu cầu khi truyền đến, Keystone phê duyệt thông tin xác thực người dùng. Lúc đầu, các thông tin xác thực này bao gồm username hoặc password, hoặc usernmae và API key. Khi các thông tin xác thực người dùng được phê duyệt, một **token** xác thực sẽ được cung cấp. Người dùng cung cấp token này cho các yêu cầu lần sau.
  
@@ -26,7 +33,7 @@
  
  - User : Đại diện cho một cá nhân (person), hệ thống (system), hoặc một dịch vụ (service) dùng Openstack serrvice. Keystone validate các yêu cầu đầu vào được tạo bởi user. User có thể login và truy cập tài nguyên bằng việc sử dụng token đã được cung cấp. User có thể được ấn định vào một project cụ thể và hành động như thể user đó được chứa trong project.
  
-## 2 Quản lý Project
+## 2 Quản lý Project <a name="2"> </a>
 
  -	List project 
  
@@ -58,7 +65,7 @@
  
 `openstack project delete PROJECT-ID`
 
-## 3 Quản lý user
+## 3 Quản lý user <a name="3"> </a>
 
  -	List user
  
@@ -90,7 +97,7 @@
  
 `openstack user show USER_NAME`
 
-## 4 Quản lý role
+## 4 Quản lý role <a name="4"> </a>
 
  -	List role
  
@@ -118,7 +125,7 @@ Nếu dùng Keystone v3, phải có thêm tùy chọn `--domain`
  
 `openstack role list --user USER_NAME --project PROJECT_ID`
 
-## 5 Phân quyền user trong file policy.json
+## 5 Phân quyền user trong file policy.json <a name="5"> </a>
 
 Một user có thể có nhiều role trong các project khác nhau hoặc có nhiểu role trong cùng một project. File `policy.json` kiểm soát quyền hạn mà user có thể thực hiện được với từng project. Để giới hạn quyền mà user có thể làm với service, cần sửa đổi trong file `policy.json`.
 
@@ -126,7 +133,7 @@ Ví dụ, muốn giới hạn user `manhdv01` có thể tạo volume. Thay đổ
 
 `"volume:create": "role:manhdv01",
 
-## Log xác thực của keystone
+## 6 Log xác thực của keystone <a name="6"> </a>
 
  Các log về xác thực của keystone sẽ được ghi lại trong file log : `/var/log/http/error.log`.
  
