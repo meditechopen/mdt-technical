@@ -4,10 +4,9 @@
 	*	[2.1 Kiến trúc của Cinder](#2.1)
 	*	[2.2 Các thành phần có trong Cinder](#2.2)
 	*	[2.3 Luồng làm việc của Cinder khi Attach Volume](#2.3)
-	*	[2.4 Các phương thức boot máy ảo (từ góc nhìn đối với Cinder)](#2.4)
-	*	[2.5 Điểm khác nhau giữa Ephemeral và Volume boot disk](#2.5)
-		*	[2.5.1. Ephemeral Boot Disk](#2.5.1)
-		*	[2.5.2 Volume Boot Disk](#2.5.2)
+	*	[2.4 Điểm khác nhau giữa Ephemeral và Volume boot disk](#2.4)
+		*	[2.4.1. Ephemeral Boot Disk](#2.4.1)
+		*	[2.4.2 Volume Boot Disk](#2.4.2)
 
 # 1. Giới thiệu tổng quan về project Cinder <a name="1"> </a>
 
@@ -48,31 +47,19 @@ Cinder là dịch vụ Block Storage trong Openstack. Nó được thiết kế 
 	- Snapshot : Một bản copy trong một thời điểm nhất định của một volume. Snapshot có thể được tạo từ một volume mà mới được dùng gaafnd ây trong trạng thái sẵn sàng. Snapshot có thể được dùng để tạo một volume mới thông qua việc tạo từ snapshot.
 	
 	- Backup : Một bản copy lưu trữ của một volume thông thường được lưu ở Swift.
-
-## 2.3 Luồng làm việc của Cinder khi Attach Volume <a name="2.3"> </a>
-
-	 - 1. Cinder gọi Cinder qua APi của cinder, truyền thông tin kết nối. Ví vụ : Host name, iSCSI initiator name, FC WWPNs
-	 - 2. Cinder-API chuyển thông điệp đến Cinder-volume. Sau đó trình kiểm tra lỗi đầu vào sẽ làm việc và gọi đến volume driver.
-	 - 3. Volume Driver sẽ chuẩn bị các yếu tố cần thiết để cho phép kết nối. Ví dụ : Cho phép máy chủ NOVA có thể truy cập vào Volume.
-	 - 4. Volume driver trả về thông tin kết nối, được truyền cho NOVA. Ví dụ : iSCSI iqn and portal, FC WWPN.
-	 - 5. NOVA tạo kết nối đến storage sử dụng thông tin được trả về.
-	 - 6. NOVA chuyển volume device/file tới hypervisor.
 	 
-## 2.4 Các phương thức boot máy ảo (từ góc nhìn đối với Cinder) <a name="2.4"> </a>
+## 2.3 Các phương thức boot máy ảo (từ góc nhìn đối với Cinder) <a name="2.3"> </a>
 
 Trong Openstack, có các cách khác nhau để tạo máy ảo là : 
 
-	- Image : Tạo một ephameral disk từ image đã chọn
-	
-	- Volume : Boot máy ảo từ một bootable volume đã có sẵn
-	
-	- Image (tạo một volume mới) : Tạo một bootable volume mới từ image đã chọn và boot mấy ảo từ đó.
-	
+	- Image : Tạo một ephameral disk từ image đã chọn	
+	- Volume : Boot máy ảo từ một bootable volume đã có sẵn	
+	- Image (tạo một volume mới) : Tạo một bootable volume mới từ image đã chọn và boot mấy ảo từ đó.	
 	- Volume snapshot (tạo một volume mới) : Tạo một volume từ volume snapshot đã chọn và boot máy ảo từ đó/
 	
-## 2.5 Điểm khác nhau giữa Ephemeral và Volume boot disk <a name="2.5"> </a>
+## 2.4 Điểm khác nhau giữa Ephemeral và Volume boot disk <a name="2.4"> </a>
 
-### 2.5.1. Ephemeral Boot Disk <a name="2.5.1"> </a>
+### 2.4.1. Ephemeral Boot Disk <a name="2.4.1"> </a>
 
 Ephemeral disk là disk ảo mà được tạo cho mục đích boot một máy ảo và nên được coi là nhất thời.
 
@@ -84,7 +71,7 @@ Một số đặc tính :
  
  - Bị xóa khi vm bị xóa : Dữ liệu trong emphemeral disk sẽ bị mất khi xóa mấy ảo
 
-### 2.5.2 Volume Boot Disk <a name="2.5.2"> </a>
+### 2.4.2 Volume Boot Disk <a name="2.4.2"> </a>
 
 Voume là dạng lưu trữ bền vững hơn ephemeral disk và có thể dùng để boot như là một block device có thể mount được.
 
