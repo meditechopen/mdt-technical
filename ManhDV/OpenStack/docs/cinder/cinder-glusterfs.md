@@ -13,11 +13,11 @@
 
  - Mô hình Lab
 
-![cinder1](/ManhDV/OpenStack/Cinder/images/cinder-gluster.png)
+![cinder1](/ManhDV/OpenStack/images/cinder-gluster.png)
 
  - IP-Planning
 
-![cinder1](/ManhDV/OpenStack/Cinder/images/ip-plan.png)
+![cinder1](/ManhDV/OpenStack/images/ip-plan.png)
 
 ## 2 Chuẩn bị hệ thống GlusterFS <a name="2"> </a>
 
@@ -27,7 +27,7 @@
  
 `gluster volume status`
 
-![cinder1](/ManhDV/OpenStack/Cinder/images/gluster-volume-status.png)
+![cinder1](/ManhDV/OpenStack/images/gluster-volume-status.png)
 
 **Tham khảo**
 
@@ -73,7 +73,7 @@ systemctl restart openstack-cinder-volume
  
 `df -hT`
 
-![cinder1](/ManhDV/OpenStack/Cinder/images/cinder-mount.png)
+![cinder1](/ManhDV/OpenStack/images/cinder-mount.png)
 
 ## 4 Cấu hình GlusterFS Backend trên node Compute <a name="4"> </a>
 

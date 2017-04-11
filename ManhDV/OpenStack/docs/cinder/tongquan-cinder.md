@@ -17,7 +17,7 @@ Cinder là dịch vụ Block Storage trong Openstack. Nó được thiết kế 
 
 ## 2.1. Kiến trúc của Cinder <a name="2.1"> </a>
 
-![cinder](/ManhDV/OpenStack/Cinder/images/cinder-achitecture.png)
+![cinder](/ManhDV/OpenStack/images/cinder-achitecture.png)
 
 
  - cinder-api : Xác thực và định tuyến các yêu cầu xuyên suốt dịch vụ Cinder. 

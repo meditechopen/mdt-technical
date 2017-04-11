@@ -18,11 +18,11 @@
 
 # 2 Workflow của Cinder khi tạo mới volume <a name="2"> </a>
 
-![cinder](/ManhDV/OpenStack/Cinder/images/cinder-process-diagram.png)
+![cinder](/ManhDV/OpenStack/images/cinder-process-diagram.png)
 
 Hình bên trên mô tả quy trình tạo Volume , tiếp theo chúng ta cùng đến với quy trình tạo ra volume mới của Cinder :
 
-![cinder](/ManhDV/OpenStack/Cinder/images/create-new-volume-diagram.png)
+![cinder](/ManhDV/OpenStack/images/create-new-volume-diagram.png)
 
 1. Client yêu cầu tạo ra Volume thông qua việc gọi REST API (Client cũng có thể sử dụng tiện ích CLI của python-client)
 2. Cinder-api : Quá trình xác nhận hợp lệ yêu cầu thông tin người dùng , một khi được xác nhận một message được gửi lên hàng chờ AMQP để xử lý.
@@ -37,7 +37,7 @@ Hình bên trên mô tả quy trình tạo Volume , tiếp theo chúng ta cùng 
 
 ## 3 Workflow của Cinder khi Attach Volume <a name="3"> </a>
 
-![cinder](/ManhDV/OpenStack/Cinder/images/cinder-process-diagram.png)
+![cinder](/ManhDV/OpenStack/images/cinder-process-diagram.png)
 
 1. Client yêu cầu attach volume thông qua Nova REST API (Client có thể sử dụng tiện ích CLI của python-novaclient)
 2. Nova-api thực hiện quá trình xác nhận yêu cầu và thông tin người dùng. Một khi đã được xác thực, gọi API Cinder để có được thông tin kết nối cho volume được xác định.
