@@ -8,6 +8,8 @@
 	- [2.1 Cài đặt trên Ubuntu](#21)
 	- [2.2 Cài đặt trên Centos](#22)
 - [3. Hướng dẫn sử dụng dashboard grafana](#3)
+	- [3.1 Thêm Plugin Zabbix vào Grafana](#31)
+	- [3.2 Thêm Data Sources](#32)
 - [4. Tạo 1 dashboard cơ bản](#4)
 - [5. Tài liệu tham khảo](#5)
 
@@ -89,6 +91,10 @@ update-rc.d grafana-server defaults 95 10
 http://<Grafana-Server-IP>:3000/
 ```
 
+Màn hình khi login
+
+<img src="http://i.imgur.com/Y0uDbzt.png">
+
 <a name="22"></a>
 ### 2.2 Cài đặt trên Centos
 
@@ -130,6 +136,64 @@ service grafana-server start
 
 /sbin/chkconfig --add grafana-server
 ```
+
+<a name="3"></a>
+### 3. Hướng dẫn sử dụng dashboard grafana
+
+<a name="31"></a>
+### 3.1 Thêm Plugin Zabbix vào Grafana
+
+Để thêm Plugin Zabbix vào Grafana thực hiện như sau
+
+- Bước 1: Trên giao diện Web của Grafana chọn `Install apps & plugins`
+
+<img src="http://i.imgur.com/vAuNIYh.png">
+
+- Bước 2: Trong danh sách các ứng dụng, tìm Zabbix Plugin
+
+<img src="http://i.imgur.com/yml0UAm.png">
+
+- Bước 3: Cài đặt Zabbix Plugin
+
+<img src="http://i.imgur.com/y0NuDhp.png">
+
+<ul>
+<li>Ta có thể chọn phiên bản Zabbix plugin trước khi cài đặt</li>
+<li>Thực hiện câu lệnh sau trên Grafana server để cài đặt Plugin</li>
+</ul>
+
+```sh
+grafana-cli plugins install alexanderzobnin-zabbix-app
+```
+
+Khởi động lại dịch vụ
+
+```sh
+service grafana-server restart
+```
+
+- Bước 4: Cài đặt Zabbix Plugin trên Web Grafana
+
+Để cài đặt chọn toogle bar -> Plugins -> Zabbix
+
+<img src="http://i.imgur.com/XupHSAF.png">
+
+- Bước 5: Enable dịch vụ
+
+<img src="http://i.imgur.com/i29p0Iy.png">
+
+Sau đó quay trở lại trang Home của Grafana kiểm tra
+
+<img src="http://i.imgur.com/UEnVFUo.png">
+
+
+<a name="32"></a>
+### 3.2 Thêm Data Sources
+
+
+
+
+
 
 
 
