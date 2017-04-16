@@ -5,8 +5,9 @@
 - [1. Giới thiệu về Grafana](#1)
 	- [1.1 Một số thuật ngữ dùng trong Grafana](#11)
 - [2. Cài đặt grafana](#2)
-	- [2.1 Cài đặt trên Ubuntu](#21)
-	- [2.2 Cài đặt trên Centos](#22)
+	- [2.1 Mô hình cài đặt và IP Planning](#21)
+	- [2.2 Cài đặt trên Ubuntu](#22)
+	- [2.3 Cài đặt trên Centos](#23)
 - [3. Hướng dẫn sử dụng dashboard grafana](#3)
 	- [3.1 Thêm Plugin Zabbix vào Grafana](#31)
 	- [3.2 Thêm Data Sources](#32)
@@ -38,11 +39,31 @@ Là công cụ mã nguồn mở phân tích số liệu một cách trực quan.
 <a name="2"></a>
 ## 2. Cài đặt grafana
 
-Cài đặt Grafana trên các distro linux khác nhau. Phiên bản ổn định mới nhất đang là Grafana 4.2.0 (x86-64 deb)
+- Cài đặt Grafana trên các distro linux khác nhau. Phiên bản ổn định mới nhất đang là Grafana 4.2.0 (x86-64 deb)
+
+- Chọn 1 trong 2 distro sau đây để thực hiện cài đặt. Ở đây tôi dùng OS là Ubuntu
 
 
 <a name="21"></a>
-### 2.1 Cài đặt trên Ubuntu
+
+### 2.1 Mô hình cài đặt và IP Planning
+
+- <b>MÔ HÌNH CÀI ĐẶT:</b>
+
+<img src="http://i.imgur.com/IHCEoCl.png">
+
+
+- <b>IP Planning</b>
+
+| Host name | IP | OS |
+|-----------|----|----|
+| Grafana | 192.168.100.42 | Ubuntu 14 |
+| Zabbix | 192.168.100.40 | Ubuntu 14 |
+
+
+
+<a name="22"></a>
+### 2.2 Cài đặt trên Ubuntu
 
 #### Thực hiện trên Ubuntu Server 14
 
@@ -95,8 +116,8 @@ Màn hình khi login
 
 <img src="http://i.imgur.com/Y0uDbzt.png">
 
-<a name="22"></a>
-### 2.2 Cài đặt trên Centos
+<a name="23"></a>
+### 2.3 Cài đặt trên Centos
 
 - Bước 1: Tải các gói cài đặt và giải nén
 
@@ -189,6 +210,27 @@ Sau đó quay trở lại trang Home của Grafana kiểm tra
 
 <a name="32"></a>
 ### 3.2 Thêm Data Sources
+
+- Bước 1: Trên toogle bar chọn `Data Sources`
+
+<img src="http://i.imgur.com/JDZHkkn.png">
+
+- Bước 2:  Add Data Sources
+
+<img src="http://i.imgur.com/Ln4Y3Rj.png">
+
+- Bước 3: Khai báo các thông số sau đây
+
+<img src="http://i.imgur.com/LygYmxN.png">
+
+<ul>
+<li>Khai báo tên của Data Sources</li>
+<li>Chọn type là Zabbix</li>
+<li>Khai báo địa chỉ IP Server cần lấy dữ liệu</li>
+<li>Nhập thông tin đăng nhập Zabbix</li>
+</ul>
+
+Chọn Save and Test
 
 
 
