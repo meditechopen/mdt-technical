@@ -85,7 +85,7 @@ RabbitMQ cung cấp web UI cho việc quản lý và giám sát RabbitMQ server.
 
 Từ giao diện quản lý có thể sử dụng, tạo, xóa và list các queue. Ngoài ra có thể giám sát độ dài queue, kiểm tra tốc độ message, thay đổi và thêm quyền hạn user.
 
-	![RABBIT](/ManhDV/RabbitMQ/images/rabbit7.png) 
+  ![RABBIT](/ManhDV/RabbitMQ/images/rabbit7.png) 
 
 ## 5. Publish và Subcribe messages
 
