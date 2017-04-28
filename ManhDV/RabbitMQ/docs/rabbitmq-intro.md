@@ -93,9 +93,9 @@ RabbitMQ mặc định sử dụng protocol AMQP. Để liên kết với Rabbit
 
  - Các bước cần tuân theo khi setup một connection và đẩy / nhận một message :
 
-	- 1. Đầu tiên, cần setup/create một đối tượng connection. Các thông tin sau cần chỉ rõ : username, password, connection URL, port... Một TCP connection sẽ được setup giữa ứng dụng và RabbitMQ khi phương thức `start` được gọi.
-	- 2. Tiếp đó một channel cần được mở. Một channel cần được tạo bên trong TCP connection. Một connection interface có thể được dùng để mở một channel và khi channel được mở thì nó có thể được dùng để nhận và gửi message.
-	- 3. Khai báo và tạo một queue. Nếu một queue không tồn tại thì trong quá trình khai báo queue sẽ được tạo trước. Tất cả các queue cần được khai báo trước khai có thể sử dụng.
-	- 4. Trong subcriber/consumer : Setup các exchange và tạo liên kết từ queue tới exchange. Tất cả exchange cần được khai báo trước khi được dùng. Một exchange chấp nhận các message từ một producer và định tuyến chúng tới message queue. Để message được định tuyến có thể tới được queue, queue cần được liên kết với exchange.
-	- 5. Trong publisher : Đẩy một message tới một exchange
-	- 6. Đóng channel và connection.
+	-  Đầu tiên, cần setup/create một đối tượng connection. Các thông tin sau cần chỉ rõ : username, password, connection URL, port... Một TCP connection sẽ được setup giữa ứng dụng và RabbitMQ khi phương thức `start` được gọi.
+	-  Tiếp đó một channel cần được mở. Một channel cần được tạo bên trong TCP connection. Một connection interface có thể được dùng để mở một channel và khi channel được mở thì nó có thể được dùng để nhận và gửi message.
+	-  Khai báo và tạo một queue. Nếu một queue không tồn tại thì trong quá trình khai báo queue sẽ được tạo trước. Tất cả các queue cần được khai báo trước khai có thể sử dụng.
+	-  Trong subcriber/consumer : Setup các exchange và tạo liên kết từ queue tới exchange. Tất cả exchange cần được khai báo trước khi được dùng. Một exchange chấp nhận các message từ một producer và định tuyến chúng tới message queue. Để message được định tuyến có thể tới được queue, queue cần được liên kết với exchange.
+	-  Trong publisher : Đẩy một message tới một exchange
+	-  Đóng channel và connection.
