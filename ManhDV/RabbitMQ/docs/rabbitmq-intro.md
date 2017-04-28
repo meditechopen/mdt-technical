@@ -91,7 +91,7 @@ Từ giao diện quản lý có thể sử dụng, tạo, xóa và list các que
 
 RabbitMQ mặc định sử dụng protocol AMQP. Để liên kết với RabbitMQ bạn cần một thư viện hiểu được giao thức mà RabbitMQ sử dụng. Bạn cần dowload client-library cho ngôn ngữ lập trình mà bạn muốn sử dụng cho ứng dụng của mình. Một client-library là một API dùng việc viết các ứng dụng client. Một client-library có một vài phương thức có thể sử dụng, trong trường hợp muốn giao tiếp với RabbitMQ. Các phương thức nên được dùng khi bạn muốn kết nối tới RabbitMQ broker (sử dụng cho các parameter, hostname, port-number đã quy định) hoặc khi bạn muốn khai báo một queue hoặc một exchange. Đây là một lựa chọn thư viện cho hầu hết các ngôn ngữ lập trình.
 
-Các bước cần tuân theo khi setup một connection và đẩy / nhận một message :
+ - Các bước cần tuân theo khi setup một connection và đẩy / nhận một message :
 
 	- 1. Đầu tiên, cần setup/create một đối tượng connection. Các thông tin sau cần chỉ rõ : username, password, connection URL, port... Một TCP connection sẽ được setup giữa ứng dụng và RabbitMQ khi phương thức `start` được gọi.
 	- 2. Tiếp đó một channel cần được mở. Một channel cần được tạo bên trong TCP connection. Một connection interface có thể được dùng để mở một channel và khi channel được mở thì nó có thể được dùng để nhận và gửi message.
