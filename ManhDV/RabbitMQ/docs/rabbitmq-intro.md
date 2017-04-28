@@ -45,16 +45,13 @@ RabbitMQ lưu trữ các message đến khi có ứng dụng kết nối tới v
  
  - Message Flow trong RabbitMQ
  
-  ![RABBIT](/ManhDV/RabbitMQ/images/rabbit4.png) 
+	![RABBIT](/ManhDV/RabbitMQ/images/rabbit4.png) 
+  
   
 	- Bước 1 : Producer gửi một message tới một exchange. Khi tạo một exchange, bạn phải định rõ ra "type" của chúng.
-	
-	- Bước 2 : Exchange nhận được các message và chịu trách nhiệm cho việc định tuyến chúng. Exchange lấy các thuộc tính message khác nhau chẳng hạn như routing key, dựa vào exchange type.
-	 
+	- Bước 2 : Exchange nhận được các message và chịu trách nhiệm cho việc định tuyến chúng. Exchange lấy các thuộc tính message khác nhau chẳng hạn như routing key, dựa vào exchange type. 
 	- Bước 3 : Các binding được tạo từ exchange tới các queue. Trong trường hợp thấy 2 binding tới 2 queue khác nhau từ một exchange thì việc định tuyến message tới queue dựa vào các thuộc tính của message.
-	
 	- Bước 4 : Các message ở trong queue tới khi chúng được kiểm soát bởi một consumer,
-	
 	- Bước 5 : Consumer kiểm soát message.
 	
 ### 3.3. Type của Exchange 
