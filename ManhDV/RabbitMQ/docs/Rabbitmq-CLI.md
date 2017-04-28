@@ -1,6 +1,6 @@
 ## Note các câu lệnh trong RabbitMQ
 
-##1. User
+## 1. User
 
  - Tạo user
 
@@ -32,7 +32,7 @@ rabbitmqctl set_user_tags user1 administrator
 rabbitmqctl delete_user user1
 ```
 
-##2. Vhost (Virtual Host)
+## 2. Vhost (Virtual Host)
 
 Khái niệm : Tương tự với khái niệm vhost trong apache. Trong RabbitMQ các tài nguyên sẽ được chia thành các logical group riêng rẽ với nhau. Mỗi Vhost thường dùng cho 1 ứng dụng riêng biệt,
 
@@ -86,7 +86,7 @@ rabbitmqctl list_user_permissions user1
 rabbitmqctl clear_permissions -p /vhost1 user1 
 ```
 
-##3. Bật các plugin : web-gui, rabbitmaqadmin
+## 3. Bật các plugin : web-gui, rabbitmaqadmin
 
  - Bật plugin 
  
@@ -103,7 +103,7 @@ chmod a+x rabbitmqadmin
 mv rabbitmqadmin /usr/sbin/
 ```
 
-##4. Port firewall trong RabbitMQ
+## 4. Port firewall trong RabbitMQ
 
 RabbitMQ sử dụng port 5672 và port 15672 cho dịch vụ WEB GUI
 
