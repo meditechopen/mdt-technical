@@ -47,11 +47,11 @@ RabbitMQ lưu trữ các message đến khi có ứng dụng kết nối tới v
  
   ![RABBIT](/ManhDV/RabbitMQ/images/rabbit4.png) 
   
-	- Bước 1 : Producer gửi một message tới một exchange. Khi tạo một exchange, bạn phải định rõ ra "type" của chúng.
-	- Bước 2 : Exchange nhận được các message và chịu trách nhiệm cho việc định tuyến chúng. Exchange lấy các thuộc tính message khác nhau chẳng hạn như routing key, dựa vào exchange type.
-	- Bước 3 : Các binding được tạo từ exchange tới các queue. Trong trường hợp thấy 2 binding tới 2 queue khác nhau từ một exchange thì việc định tuyến message tới queue dựa vào các thuộc tính của message.
-	- Bước 4 : Các message ở trong queue tới khi chúng được kiểm soát bởi một consumer,
-	- Bước 5 : Consumer kiểm soát message.
+	 - Bước 1 : Producer gửi một message tới một exchange. Khi tạo một exchange, bạn phải định rõ ra "type" của chúng.
+	 - Bước 2 : Exchange nhận được các message và chịu trách nhiệm cho việc định tuyến chúng. Exchange lấy các thuộc tính message khác nhau chẳng hạn như routing key, dựa vào exchange type.
+	 - Bước 3 : Các binding được tạo từ exchange tới các queue. Trong trường hợp thấy 2 binding tới 2 queue khác nhau từ một exchange thì việc định tuyến message tới queue dựa vào các thuộc tính của message.
+	 - Bước 4 : Các message ở trong queue tới khi chúng được kiểm soát bởi một consumer,
+	 - Bước 5 : Consumer kiểm soát message.
 	
 ### 3.3. Type của Exchange 
 
@@ -60,11 +60,8 @@ RabbitMQ lưu trữ các message đến khi có ứng dụng kết nối tới v
   ![RABBIT](/ManhDV/RabbitMQ/images/rabbit6.png) 
   
  - Direct : Một direct exchange sẽ phân phối các message tới các queue dựa vào message routing key. Trong direct exchange, message được định tuyến tới các queue có binding key match với routing key của message. Nếu một queue liên kết với exchange  binding key là `pdfprocess`, một message được gửi tới exchange với routing key là `pdfprocess` sẽ được định tuyến tới queue này.
- 
  - Fanout : Fanout exchane sẽ định tuyến các message tới tất cả các queue mà liên kết tới chúng.
- 
  - Topic : Topic exchange thực hiện wildcard match giữa routing key và routing pattern được chỉ định trong binding.
- 
  - Headers : Headers exchange sử dụng message header attribute cho việc routing 
  
 ### 3.4 Các định nghĩa trong RabbitMQ
