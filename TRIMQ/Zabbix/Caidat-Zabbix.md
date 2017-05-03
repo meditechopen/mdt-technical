@@ -26,7 +26,7 @@
 <a name="11"></a>
 ## 1.1 LAB Topology
 
-<img src="">
+<img src="http://i.imgur.com/oMIGpiD.png">
 
 <a name="12"></a>
 ## 1.2 IP Planning
@@ -35,8 +35,8 @@
 |----------|----|----|
 | Zabbix-SRV | 192.168.100.40 | Ubuntu 14.04 |
 | U14 | 192.168.100.42 | Ubuntu 14.04 |
-| CentOS 6 |  | CentOS 6 |
-| Windows |  | Windows SRV 2012 |
+| CentOS 6 | 192.168.100.31 | CentOS 6 |
+| Windows | 192.168.100.144 | Windows SRV 2012 |
 
 
 <a name="2"></a>
