@@ -233,6 +233,15 @@ Sau đó quay trở lại trang Home của Grafana kiểm tra
 Chọn Save and Test
 
 
+<a name="4"></a>
+
+## 4. Tạo 1 dashboard cơ bản
+
+Tạo 1 Dashboard để giám sát host với Plugin Zabbix. Để có thể tạo 1 dashboard giám sát host với Plugin Zabbix cần phải cài đặt thành công Zabbix Server và giám sát được host. Tham khảo cài đặt Zabbix tại [đây](https://www.zabbix.com/documentation/3.0/manual/installation/install_from_packages)
+
+
+
+
 
 
 
