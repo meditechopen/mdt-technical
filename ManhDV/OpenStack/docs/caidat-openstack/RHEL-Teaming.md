@@ -1,5 +1,5 @@
-##I. Network teaming trên RHEL
-###1. Hiểu về network teaming
+## I. Network teaming trên RHEL
+### 1. Hiểu về network teaming
 Việc kết hợp hay gộp chung các đường mạng để nhằm cung cáo một đường logic với mục đích thu được **network throughput**(1) cao hơn, hoặc cung cấp một **redundancy**(2), được biết với nhiều tên như "channel bonding", "Ethernet bonding", "port trunking", "channel teaming", "NIC teaming", "link aggregation"... Các định nghĩa này được hiểu chung trong Linux là "bonding". Thuật ngữ "Network Teaming" được coi là một cách biểu diễn mới, đưa ra như một sự lựa chọn và không thay thế bonding. Các driver bonding đã tồn tại sẽ không bị ảnh hưởng.
 
 Network teaming (Team), được cung cấp một driver kernel nhỏ để kiểm soát nhanh các packet flow, và các ứng dụng user-space đa dạng. Driver có một API (Tean Netlink API), biểu diễu các giao tiếp Netlink. Các ứng dụng user-space có thể dùng API này để giao tiếp với driver. Một thư viện (lib), được cung cấp để user-space bao phủ các giao tiếp Team Netlink và RT Netlink messages. Một ứng dụng nền **teamd**, sử dụng Libteam **lib**. Một instance của **teamd** có thể kiểm soát một instance của Team driver. **Runner**, tiến trình nền phụ trách việc load-balancing và active-backup logic như là round-robin. 
@@ -10,7 +10,7 @@ Team Netlink API giao tiếp với các ứng dụng user-space sử dụng Netl
 
 Tóm lại, các instance của Team driver, đang chạy trong kernel, không được cấu hình hoặc kiểm soát trực tiếp. Tất cả cấu hình được hoàn thành với sự giúp đỡ của các ứng dụng user-space, như là **teamd**. Ứng dụng sau đó sẽ tương tác trực tấp với một phần kernel driver.
 
-####2. Hiểu về trạng thái mặc định của các interface Master và Slave.
+#### 2. Hiểu về trạng thái mặc định của các interface Master và Slave.
 
 Khi kiểm soát các teamd port interface sử dụng tiến trình NetworkManager, đặc biệt là trong quá trình tìm lỗi, hãy lưu ý các điều sau : 
 
@@ -24,7 +24,7 @@ Khi kiểm soát các teamd port interface sử dụng tiến trình NetworkMana
  
 **Chú ý** : Việc dùng các kết nối cap trực tiếp mà không dùng switch sẽ không được hỗ trợ bởi teaming.
 
-####3. So sánh Network Teaming với Bonding
+#### 3. So sánh Network Teaming với Bonding
 
 |Tính năng|Bonding|Team|
 |---------|-------|----|
@@ -56,7 +56,7 @@ Khi kiểm soát các teamd port interface sử dụng tiến trình NetworkMana
 |zero config using LLDP	|No	|(in planning)|
 |NetworkManager|support|Yes|Yes|
 
-####4. Hiểu về Network teaming deamon và "runner"
+#### 4. Hiểu về Network teaming deamon và "runner"
 
 Tiến trình **teamd**, sử dụng **libteam** để kiểm soát mỗi instance của team driver. Instance này thêm các instance của driver thiết bị phần cứng thành một **team**. Một team driver biểu diễn một network interface, ví dụ như "team0". Interface được tạo từ bởi các instance của team driver được gán tên như là team0, team1...
 
@@ -76,8 +76,8 @@ Ngoài ra, có một số link-watcher sẵn sàng :
 
 **Chú ý** : Khi chạy lacp runner, nên dùng ethtool làm link-watcher. 
 
-####5. Cài đặt và cấu hình teaming
-####5.1 Cài đặt tiến trình network teaming.
+#### 5. Cài đặt và cấu hình teaming
+#### 5.1 Cài đặt tiến trình network teaming.
 
 Sử dụng quyền root, cài đặt teamd : 
 
@@ -85,7 +85,7 @@ Sử dụng quyền root, cài đặt teamd :
 yum install teamd
 ```
 
-####5.2 Chọn các interface để dùng như các port trong network team
+#### 5.2 Chọn các interface để dùng như các port trong network team
 Để xem các interface sẵn sàng, dùng câu lệnh sau :
 
 ```sh
@@ -97,7 +97,7 @@ ip link show
 3: em2:  <BROADCAST,MULTICAST,UP,LOWER_UP > mtu 1500 qdisc pfifo_fast state UP mode DEFAULT qlen 1000
 link/ether 52:54:00:9b:6d:2a brd ff:ff:ff:ff:ff:ff
 ```
-##6. Các phương thức tạo network team.
+## 6. Các phương thức tạo network team.
 Có cách phương thức tạo network team như sau : 
 
  -	Sử dụng công cụ text user interface của NetworkManager - **nmtui**.
@@ -108,8 +108,8 @@ Có cách phương thức tạo network team như sau :
  
 Tôi sẽ hướng dẫn tạo team bằng 2 phương thức đó là sử dụng **nmcli** và file cấu hình.
 
-####6.1 Tạo team bằng nmcli
-####Step1 : Thực hiện show các thiết bị sẵn sàng trên hệ thống, dùng câu lệnh : 
+#### 6.1 Tạo team bằng nmcli
+#### Step1 : Thực hiện show các thiết bị sẵn sàng trên hệ thống, dùng câu lệnh : 
 
 ```sh
 ~]$ nmcli connection show
@@ -118,7 +118,7 @@ NAME  UUID                                  TYPE            DEVICE
 eth1  0e8185a1-f0fd-4802-99fb-bedbb31c689b  802-3-ethernet  --
 eth0  dfe1f57b-419d-4d1c-aaf5-245deab82487  802-3-ethernet  --
 ```
-####Step2 : Tạo một team interface mới, với tên là team-ServerA :
+#### Step2 : Tạo một team interface mới, với tên là team-ServerA :
 
 ```sh
 ~]$ nmcli connection add type team con-name team0 ifname team0
@@ -140,7 +140,7 @@ connection.autoconnect:                 yes
 ipv4.method:                            auto
 [output truncated]
 ```
-##Step3. Thêm interface eth0 vào team0, với tên là team0-port1 
+#### Step3. Thêm interface eth0 vào team0, với tên là team0-port1 
 
 ```sh
 ~]$ nmcli con add type team-slave con-name team0-port1 ifname eth0 master team0
@@ -154,7 +154,7 @@ Tương tự, add eth1
 Connection 'team0-port2' (a89ccff8-8202-411e-8ca6-2953b7db52dd) successfully added.
 ```
 
-##Step4. Khởi động team và các port của team.
+#### Step4. Khởi động team và các port của team.
 
 ```sh
 ~]$ nmcli connection up team0-port1
