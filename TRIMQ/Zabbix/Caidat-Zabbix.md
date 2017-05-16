@@ -10,12 +10,15 @@
 	- [3.1 Cài đặt trên Ubuntu](#31)
 	- [3.2 Cài đặt trên CentOS](#32)
 	- [3.3 Cài đặt trên Windows](#33)
-- [4. Khác](#4)
+- [4. Thao tác với các host giám sát](#4)
 	- [4.1 Thêm host](#41)
 	- [4.2 Thêm Template cho host](#42)
 	- [4.3 Thêm item cho host](#43)
 	- [4.4 Thêm trigger](#44)
-- [5. Tài liệu tham khảo](#5)
+- [5. Khác](#5)
+	- [5.1 Chỉnh sửa template](#51)
+	- [5.2 Sử dụng template ICMP]
+- [6. Tài liệu tham khảo](#6)
 
 ----------------------------------------------------
 
@@ -144,22 +147,25 @@ http://<IP-ZABBIX-SRV>/zabbix
 
 #### Trên U16.04
 
+```sh
 wget http://repo.zabbix.com/zabbix/3.0/ubuntu/pool/main/z/zabbix-release/zabbix-release_3.0-1+xenial_all.deb
 dpkg -i zabbix-release_3.0-1+xenial_all.deb
 apt-get update
+```
 
-
+```sh
 #### Trên U14.04
 wget http://repo.zabbix.com/zabbix/3.0/ubuntu/pool/main/z/zabbix-release/zabbix-release_3.0-1+trusty_all.deb
 dpkg -i zabbix-release_3.0-1+trusty_all.deb
 sudo apt-get update
+```
 
-
+```sh
 #### Trên U12
 wget http://repo.zabbix.com/zabbix/2.2/ubuntu/pool/main/z/zabbix-release/zabbix-release_2.2-1+precise_all.deb
 dpkg -i zabbix-release_2.2-1+precise_all.deb
 apt-get update
-
+```
 
 #### Ở đây do tôi dùng U14, nên chỉ tải gói của U14
 
@@ -259,6 +265,23 @@ http://www.zabbix.com/download
 
 <a name="4"></a>
 ## 4. Khác
+
+Một số thao tác với Zabbix
+
+<a name="41"></a>
+### 4.1 Thêm host
+
+Để thêm 1 host mới trên dashboard Zabbix, làm theo các bước sau
+
+- Bước 1: Thực hiện add host
+
+<img src="">
+
+- Bước 2: Nhập các thông số sau
+
+<img src="">
+
+
 
 
 
