@@ -153,6 +153,8 @@ dpkg -i zabbix-release_3.0-1+xenial_all.deb
 apt-get update
 ```
 
+#### Trên U14.04
+
 ```sh
 #### Trên U14.04
 wget http://repo.zabbix.com/zabbix/3.0/ubuntu/pool/main/z/zabbix-release/zabbix-release_3.0-1+trusty_all.deb
@@ -160,8 +162,9 @@ dpkg -i zabbix-release_3.0-1+trusty_all.deb
 sudo apt-get update
 ```
 
-```sh
 #### Trên U12
+
+```sh
 wget http://repo.zabbix.com/zabbix/2.2/ubuntu/pool/main/z/zabbix-release/zabbix-release_2.2-1+precise_all.deb
 dpkg -i zabbix-release_2.2-1+precise_all.deb
 apt-get update
