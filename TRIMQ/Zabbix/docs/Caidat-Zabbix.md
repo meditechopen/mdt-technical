@@ -364,7 +364,7 @@ Trigger là các ngưỡng cảnh báo được đặt ra dựa theo thông số
 
 - Bước 1: Thực hiện thêm trigger
 
-<img src="http://i.imgur.com/undefined.png">
+<img src="http://i.imgur.com/GbOhcbo.png">
 
 - Bước 2: Điền các thông số sau
 
