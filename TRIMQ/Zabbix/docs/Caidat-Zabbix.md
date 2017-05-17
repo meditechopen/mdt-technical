@@ -402,13 +402,36 @@ Sau khi thực hiện xong các bước, chọn `Insert`
 Như vậy là tôi đã tạo trigger cho giá trị cần giám sát
 
 
+<a name=""></a>
+## 5. Khác
+
+Các thao tác khác với Dashboard
+
+<a name=""></a>
+### 5.1 Chỉnh sửa template
+
+Trong trường hợp có nhiều host giám sát cần sử dụng template, để tiết kiệm thời gian, ta sẽ sửa các item, trigger, graph...trong template theo ý muốn rồi add cho các host giám sát
+
+<img src="http://i.imgur.com/jbZmBIKg.png">
+
+- Có thể sửa 1 template có sẵn hoặc tạo mới template
+
+- Các bước thêm item, trigger... thực hiện như ở các mục trên
 
 
+<a name=""></a>
+### 5.2 Sử dụng template ICMP
+
+Sử dụng template ICMP để giám sát tình trạng UP/DOWN của host cần giám sát. Trong trường hợp các host giám sát không thể login vào để cài agent, template ICMP sẽ liên tục thực hiện ping tới địa chỉ của host đó theo giao thức ICMP
 
 
+<a name="6"></a>
+## 6. Tài liệu tham khảo
 
-
-
+- [1] - https://www.zabbix.com/documentation/3.0/manual/installation/install_from_packages
+- [2] - https://www.zabbix.com/documentation/3.0/manual/config/items/item
+- [3] - https://www.zabbix.com/documentation/3.0/manual/config/triggers/expression
+- [4] - https://www.zabbix.com/documentation/3.0/manual/config/items/itemtypes/zabbix_agent
 
 
 
