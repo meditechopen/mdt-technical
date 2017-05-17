@@ -357,7 +357,7 @@ Sau khi điền xong các thông số cơ bản trên, chọn `Add`
 
 Như vậy là tôi đã thêm thành công 1 item
 
-< a name="44"></a>
+<a name="44"></a>
 ### 4.4 Thêm trigger
 
 Trigger là các ngưỡng cảnh báo được đặt ra dựa theo thông số mà các item thu được từ host giám sát. Để add các trigger làm theo các bước sau
@@ -368,7 +368,7 @@ Trigger là các ngưỡng cảnh báo được đặt ra dựa theo thông số
 
 - Bước 2: Điền các thông số sau
 
-<img src="">
+<img src="http://i.imgur.com/2t5HiVV.png">
 
 <ul>
 <li>Name: tên của trigger</li>
