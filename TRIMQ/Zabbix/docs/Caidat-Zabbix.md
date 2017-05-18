@@ -272,8 +272,6 @@ http://www.zabbix.com/download
 
 - Bước 2: Tạo 1 thư mục có tên `zabbix` trong ổ C
 
-<img src="">
-
 - Bước 3: Tìm và Copy những file như hình sau vào thư mục zabbix vừa tạo. Lưu ý là chọn những file thuộc thư mục Win64 nếu dùng Windows 64 bits
 
 <img src="http://i.imgur.com/FrkR7ki.png">
@@ -298,7 +296,7 @@ Hostname=<Hostname_Windows>
 
 - Bước 6: Khởi động dịch vụ
 
-<img src="http://i.imgur.com/SiN9Ohs.png"
+<img src="http://i.imgur.com/SiN9Ohs.png">
 
 ### Mở rule cho Windows
 
@@ -310,7 +308,7 @@ Trong 1 số trường hợp cần phải tạo rule cho firewall của Windows 
 
 - Bước 2: Tạo Rule cho chiều `inbound Rules`
 
-<img src="http://i.imgur.com/AKGumFy.png"
+<img src="http://i.imgur.com/AKGumFy.png">
 
 - Bước 3: Tạo Rule theo port
 
