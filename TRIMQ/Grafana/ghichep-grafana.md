@@ -12,7 +12,11 @@
 	- [3.1 Thêm Plugin Zabbix vào Grafana](#31)
 	- [3.2 Thêm Data Sources](#32)
 - [4. Tạo 1 dashboard cơ bản](#4)
-- [5. Tài liệu tham khảo](#5)
+	- [4.1 Singlestat](#41)
+	- [4.2 Graph](#42)
+	- [4.3 Pie Chart](#43)
+- [5. Khác](#5)
+- [6. Tài liệu tham khảo](#6)
 
 ------------------------------------------------------
 
@@ -237,7 +241,42 @@ Chọn Save and Test
 
 ## 4. Tạo 1 dashboard cơ bản
 
-Tạo 1 Dashboard để giám sát host với Plugin Zabbix. Để có thể tạo 1 dashboard giám sát host với Plugin Zabbix cần phải cài đặt thành công Zabbix Server và giám sát được host. Tham khảo cài đặt Zabbix tại [đây](https://www.zabbix.com/documentation/3.0/manual/installation/install_from_packages)
+Tạo 1 Dashboard để giám sát host với Plugin Zabbix. Để có thể tạo 1 dashboard giám sát host với Plugin Zabbix cần phải cài đặt thành công Zabbix Server và giám sát được host. Tham khảo cài đặt Zabbix tại [đây](https://github.com/trimq/mdt-technical/blob/master/TRIMQ/Zabbix/docs/Caidat-Zabbix.md)
+
+- Bước 1: Tạo Dashboard
+
+<img src="http://i.imgur.com/W2SNj05.png">
+
+- Bước 2: Lưu lại Dashboard vừa tạo và đặt tên
+
+<img src="http://i.imgur.com/F9gv942.png">
+
+
+<a name="41">
+4.1 Singlestat
+
+Singlestat sử dụng để hiển thị các thông số đơn như số User login, System Uptime, Server status...
+
+- Tạo biểu đồ:
+
+<img src="http://i.imgur.com/aVd1HnE.png">
+
+
+- Chỉnh sửa biểu đồ:
+
+<img src="http://i.imgur.com/FFJ6nXE.png">
+
+- Đặt tên cho biểu đồ
+
+<img src="">
+
+- Thêm metric cho biểu đồ
+
+### Lưu ý: Các metric này chính là các item của Zabbix. Trên Zabbix bắt buộc phải có những item này thì Grafana mới nhận được dữ liệu để đưa ra biểu đồ
+
+
+
+
 
 
 
