@@ -203,7 +203,7 @@ update-rc.d zabbix-agent defaults
 
 
 <a name="32"></a>
-## 3.2 Cài đặt trên CentOS
+### 3.2 Cài đặt trên CentOS
 
 
 - Bước 1: Tải các gói cài đặt, tùy vào phiên bản của CentOS lựa chọn một trong các gói cài đặt thích hợp
@@ -257,7 +257,7 @@ vi /etc/sysconfig/iptables
 
 
 <a name="33"></a>
-## 3.3 Cài đặt trên Windows
+### 3.3 Cài đặt trên Windows
 
 
 - Bước 1: Tải gói cài đặt Zabbix-agent tại đây
@@ -265,6 +265,70 @@ vi /etc/sysconfig/iptables
 ```sh
 http://www.zabbix.com/download
 ```
+
+<img src="http://i.imgur.com/l690Q7i.png">
+
+- Bước 1: Sau khi tải gói Zabbix-agent cần giải nén
+
+- Bước 2: Tạo 1 thư mục có tên `zabbix` trong ổ C
+
+- Bước 3: Tìm và Copy những file như hình sau vào thư mục zabbix vừa tạo. Lưu ý là chọn những file thuộc thư mục Win64 nếu dùng Windows 64 bits
+
+<img src="http://i.imgur.com/FrkR7ki.png">
+
+- Bước 3: Sau khi copy mở cmd và thực hiện câu lệnh sau để cài zabbix-agent
+
+```sh
+C:\zabbix\zabbix_agentd.exe --config C:\zabbix\zabbix_agentd.win.conf --install
+```
+
+- Bước 4: Sửa file cấu hình `C:\zabbix\zabbix_agentd.win.conf`. Sửa các dòng sau
+
+```sh
+Server=<IP_Zabbix_SRV>
+ServerActive=<IP_Zabbix_SRV>
+Hostname=<Hostname_Windows>
+```
+
+- Bước 5: Sử dụng nút Windows để tìm kiếm tab `Services` và tìm dịch vụ Zabbix-agent
+
+<img src="http://i.imgur.com/Ubah74Q.png">
+
+- Bước 6: Khởi động dịch vụ
+
+<img src="http://i.imgur.com/SiN9Ohs.png">
+
+### Mở rule cho Windows
+
+Trong 1 số trường hợp cần phải tạo rule cho firewall của Windows để Zabbix-SRV lấy được dữ liệu từ agent. các bước làm như sau
+
+- Bước 1: Tìm kiếm `windows firewall with advanced security` trên nút `Windows`
+
+<img src="http://i.imgur.com/P6TUMbo.png">
+
+- Bước 2: Tạo Rule cho chiều `inbound Rules`
+
+<img src="http://i.imgur.com/AKGumFy.png">
+
+- Bước 3: Tạo Rule theo port
+
+<img src="http://i.imgur.com/UD7RjBY.png">
+
+- Bước 4: Tạo port sử dụng giao thức TCP
+
+<img src="http://i.imgur.com/F1sWjCz.png">
+
+- Bước 5: Chọn `Allow the Connection` và ấn `Next`. Ấn `Next` ở bước kế tiếp
+
+- Bước 6: Đặt tên cho Rule
+
+<img src="http://i.imgur.com/Opx7Ukp.png">
+
+Như vậy là tôi đã tạo 1 Rule cho Windows firewall
+
+#### Các bước add host cũng làm tương tự như với Linux
+
+
 
 <a name="4"></a>
 ## 4. Khác
