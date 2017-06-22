@@ -3,6 +3,7 @@
 Bài viết này là phần cuối cùng của series bài về Fibre Channel. Xem các bài viết trước theo link dưới đây
 
 [Phần I: Địa chỉ FCP và WWPN](https://github.com/trimq/mdt-technical/blob/master/TRIMQ/Storage/docs/FibreChannel-Part-I.md)
+
 [Phần II: ZONING, LUN MASKING và FABRIC LOGIN](https://github.com/trimq/mdt-technical/blob/master/TRIMQ/Storage/docs/FibreChannel-Part-II.md)
 
 ## Mục lục
