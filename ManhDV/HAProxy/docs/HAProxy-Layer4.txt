@@ -1,0 +1,197 @@
+## Cấu hình HAProxy như là một Load-Balancer Layer 4 cho ứng dụng Web Wordpress trên Ubuntu 14.04
+
+## I. Chuẩn bị
+
+ - Mô hình
+
+![HA](/images/1-topo.png)
+
+ - IP Planning 
+
+![HA](/images/2-ip-plan.png)
+
+## II. Cài đặt
+
+### 1. Cài đặt MySQL Server
+
+ - Thực hiện trên máy MySQL server 192.168.100.5
+ 
+ - Cài đặt MySQL server 
+
+```sh
+apt-get update
+apt-get install mysql-server
+```
+
+ - Khởi tạo DB và nhập các thông tin xác thực :
+ 
+```sh
+mysql_install_db
+mysql_secure_installation
+```
+
+ - Cấu hình cho phép truy cập từ client tại file `/etc/mysql/my.cnf`
+ 
+```sh
+[mysqld]
+bind-address        = 192.168.100.5
+```
+
+ - Khởi động lại service mysql
+ 
+```sh
+service mysql restart
+```
+
+ - Cấu hình tạo DB cho các máy Wordpress
+ 
+```sh
+mysql -u root -p
+CREATE DATABASE wordpress;
+CREATE USER 'wordpressuser'@'localhost' IDENTIFIED BY 'password';
+GRANT ALL PRIVILEGES ON wordpress.* TO 'wordpressuser'@'localhost';
+CREATE USER 'wordpressuser'@'192.168.100.6' IDENTIFIED BY 'password';
+CREATE USER 'wordpressuser'@'192.168.100.7' IDENTIFIED BY 'password';
+GRANT SELECT,DELETE,INSERT,UPDATE ON wordpress.* TO 'wordpressuser'@'192.168.100.6';
+GRANT SELECT,DELETE,INSERT,UPDATE ON wordpress.* TO 'wordpressuser'@'192.168.100.7';
+GRANT ALL PRIVILEGES ON wordpress.* TO 'wordpressuser'@'192.168.100.6';
+GRANT ALL PRIVILEGES ON wordpress.* TO 'wordpressuser'@'192.168.100.7';
+FLUSH PRIVILEGES;
+exit
+```
+
+ - Test việc truy cập vào mysql server 
+  
+  - Tại MySQL server :
+  
+  ```sh
+  mysql -u wordpressuser -p
+  show databases;
+  ```
+  
+  - Tại 2 máy wordpress 
+  
+  ```sh
+  apt-get update
+  apt-get install mysql-client
+  mysql -u wordpressuser -h 192.168.100.5 -p
+  ```
+  
+  Kết quả là truy cập được vào database nghĩa là thành công.
+  
+### 2. Cài đặt Wordpress1 192.168.100.6
+
+#### 2.1 Setup Web server dùng Nginx
+
+ - Tải Nginx
+ 
+```sh
+apt-get install nginx php5-fpm php5-mysql
+```
+
+ - Chỉnh sửa PHP
+
+```sh
+vi /etc/php5/fpm/php.ini
+
+cgi.fix_pathinfo=0
+```
+
+```sh
+vi /etc/php5/fpm/pool.d/www.conf
+listen = /var/run/php5-fpm.sock
+```
+
+ - Restart service
+ 
+```sh
+ service php5-fpm restart
+```
+
+ - Cấu hình Nginx
+
+```sh
+cp /etc/nginx/sites-available/default /etc/nginx/sites-available/example.com
+```
+
+```sh
+vi /etc/nginx/sites-available/example.com
+
+server {
+    listen 80;
+    root /var/www/example.com;
+    index index.php index.hmtl index.htm;
+    server_name example.com;
+    location / {
+        try_files $uri $uri/ /index.php?q=$uri&$args;
+    }
+    error_page 404 /404.html;
+    error_page 500 502 503 504 /50x.html;
+    location = /50x.html {
+        root /usr/share/nginx/www;
+    }
+    location ~ \.php$ {
+        try_files $uri =404;
+        fastcgi_pass unix:/var/run/php5-fpm.sock;
+        fastcgi_index index.php;
+        include fastcgi_params;
+    }
+}
+```
+ 
+ - Enable thư mục và remove link từ file mặc định, restart dịch vụ
+ 
+```sh
+rm /etc/nginx/sites-enabled/default
+ln -s /etc/nginx/sites-available/example.com /etc/nginx/sites-enabled/
+service nginx restart
+```
+
+#### 2.2. Setup Wordpress
+
+ - Tải file wordpress và cấu hình
+ 
+```sh
+cd ~
+wget http://wordpress.org/latest.tar.gz
+tar xzvf latest.tar.gz
+cp ~/wordpress/wp-config-sample.php ~/wordpress/wp-config.php
+```
+
+ - Sửa cấu hình trong file `/wordpress/wp-config.php`
+
+```sh
+/** The name of the database for WordPress */
+define('DB_NAME', 'wordpress');
+
+/** MySQL database username */
+define('DB_USER', 'wordpressuser');
+
+/** MySQL database password */
+define('DB_PASSWORD', 'password');
+
+/** MySQL hostname */
+define('DB_HOST', '192.168.100.5');
+```
+
+ - Phân quyền 
+ 
+```sh
+mkdir -p /var/www/example.com
+cp -r ~/wordpress/* /var/www/example.com
+cd /var/www/example.com
+chown -R www-data:www-data *
+usermod -a -G www-data meditech
+chmod -R g+rw /var/www/example.com
+```
+
+ - Thực hiện các bước cấu hình trên giao diện web
+ 
+ - Truy cập browser với địa chỉ : http://192.168.100.6
+ 
+ ![HA](/images/3-admin_setup.png)
+ 
+ ![HA](/images/4-admin_login.png)
+ 
+ - Truy cập trang để test : http://192.168.100.6
+ 
