@@ -4,11 +4,11 @@
 
  - Mô hình
 
-![HA](/images/1-topo.png)
+![HA](/ManhDV/HAProxy/images/1-topo.png)
 
  - IP Planning 
 
-![HA](/images/2-ip-plan.png)
+![HA](/ManhDV/HAProxy/images/2-ip-plan.png)
 
 ## II. Cài đặt
 
