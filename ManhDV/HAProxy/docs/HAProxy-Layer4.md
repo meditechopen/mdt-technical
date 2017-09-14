@@ -189,9 +189,9 @@ chmod -R g+rw /var/www/example.com
  
  - Truy cập browser với địa chỉ : http://192.168.100.6
  
- ![HA](/images/3-admin_setup.png)
+ ![HA](/ManhDV/HAProxy/images/3-admin_setup.png)
  
- ![HA](/images/4-admin_login.png)
+ ![HA](/ManhDV/HAProxy/images/4-admin_login.png)
  
  - Truy cập trang để test : http://192.168.100.6
  
