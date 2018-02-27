@@ -25,7 +25,7 @@ Storage Driver : overlay
 
 Khi 1 docker image được pull từ registry, engine dowload tất cả các layer phụ thuộc tới host. Khi container được tạo từ 1 image gồm nhiều layer, docker dùng khả năng *Copy-on-Write* của layered file system để thêm 1 thư mục read write trên lên lớp trên của các layer read only đã có sẵn.
 
-![Docker](/ManhDV/Docker/images/container-leyers.jpg)
+![Docker](/ManhDV/Docker/images/container-layers.jpg)
 
 Pull 1 image ubuntu từ Docker Hub
 ```sh
@@ -223,7 +223,7 @@ Persistent volume có thể được tạo trước container và sau đó attac
     ...
 ```
 
-*Chú ý* : Persistent volume được khởi tại khi 1 container được tạo. Nếu image parent của container chứa dữ liệu tại một mount point nào đó, data đã tồn tại được copy tới volume mới trong lúc khởi tạo volume.
+**Chú ý** : Persistent volume được khởi tại khi 1 container được tạo. Nếu image parent của container chứa dữ liệu tại một mount point nào đó, data đã tồn tại được copy tới volume mới trong lúc khởi tạo volume.
 
 Các persisten volume có thể được mount trên bất kỳ thư mục nào của filesystem trên host. Điều này giúp chia sẽ dữ liệu giữa host và container. VD, bạn có thể mount volume trên thư mục `/logs` của host đang chạy container :
 ```sh
@@ -238,7 +238,7 @@ Lúc này volume data sẽ được đặt tại thư mục `/logs` của host.
 
 Volume có thể được mount bởi các container khác. Tuy nhiên việc nhiều container cùng viết xuống 1 single shared volume có thể khiến dữ liệu bị sai lệch.
 
-*Chú ý* : Khi mounting một persistent volume trên một thư mục host, nếu image parent của container chứa dữ liệu tại một mount point nào đó, data đã tồn tại được copy tới volume mới trong lúc khởi tạo volume.
+**Chú ý** : Khi mounting một persistent volume trên một thư mục host, nếu image parent của container chứa dữ liệu tại một mount point nào đó, data đã tồn tại được copy tới volume mới trong lúc khởi tạo volume.
 
 ### 3. Registry
 #### 3.1 Docker registry service
