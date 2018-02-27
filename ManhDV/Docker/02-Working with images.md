@@ -160,7 +160,7 @@ RUN echo Your Web server is successful > /var/www/html/index.html
  - `MANITAINER` statement đại diện cho trường `Author` của image được tạo.
  - `LABEL` statement ghi nhãn cho image với một chuỗi text do người dùng đặt ra.
  - `USSER` statement đặt user name hoặc UUID để dùng khi chạy 1 image.
- - 'RUN` statement xử lý bất kỳ câu lệnh nào trong layer mới trên top của image và commit kết quả. Kết quả sẽ được dùng tại bước tiếp theo của Dockerfile. Để tránh 1 layer mới được thêm vào mỗi RUN statement, multiple RUN statement có thể được tổ hợp trong 1 single instruction. Để khiến Dockerfile dễ hiểu và tiện lợi hơn, có thể đặt các câu lệnh sau dấu `\` . Việc tóm tắt Dockerfile có dạng như sau : 
+ - 'RUN` statement xử lý bất kỳ câu lệnh nào trong layer mới trên top của image và commit kết quả. Kết quả sẽ được dùng tại bước tiếp theo của Dockerfile. Để tránh 1 layer mới được thêm vào mỗi RUN statement, multiple RUN statement có thể được tổ hợp trong 1 single instruction. Để khiến Dockerfile dễ hiểu và tiện lợi hơn, có thể đặt các câu lệnh sau dấu \ . Việc tóm tắt Dockerfile có dạng như sau : 
  
 ```sh
 # My HTTP Docker image: version 1.1
@@ -265,7 +265,7 @@ Start container từ image đó và kiểm tra hoạt động :
 <body><h1>Hello Docker!</h1></body>
 </html>
 ```
-Chú ý :
+**Chú ý**  :
 	- Tránh cài đặt các package không cần thiết
 	- Chỉ chạy 1 process mỗi container
 	- Giảm thiếu tối đa số lượng layer

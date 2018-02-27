@@ -1,4 +1,4 @@
-##Bắt đầu với Containter
+## Bắt đầu với Containter
 
 Docker cho phép chạy ứng dụng bên trong Linux Containter
 	- Chạy 1 containter
@@ -175,7 +175,7 @@ Host is up (0.0045s latency).
 ...
 ```
 
-4. Kiểm tra một container.
+### 4. Kiểm tra một container.
 
 Để kiểm tra 1 container, sử dụng `inspect` command :
 
