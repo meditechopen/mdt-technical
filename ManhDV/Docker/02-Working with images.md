@@ -116,6 +116,7 @@ The push refers to a repository [docker.io/kalise/myhttpd]
 
 ### 3. Tạo 1 file image từ Docker file
 Việc dựng 1 container image từ Dockerfile file là một phương pháp tốt hơn để tạo các container với định dạng tốt hơn, so với việc chỉnh sửa các container đang chạy và tiến hành commit chúng thành image. Ví dụ sau đây thực hiện việc tạo 1 Dockerfile file để tạo image Apache Web Server riêng từ image Centos base. Các bước thực hiện :
+
 	- 1. Chọn 1 base image
 	- 2. Cài đặt các packge cần thiết cho Apache Web server
 	- 3. Map server port tới port chỉ định trên host
