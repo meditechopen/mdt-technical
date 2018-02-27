@@ -11,7 +11,8 @@ Phần này sẽ đi sâu vào chi tiết của 3 lớp lưu trữ riêng biệt
 Lưu trữ được dùng cho việc đọc các tầng image filesystem từ một trạng thái container đang chạy với đặc trưng là yêu cầu IOPS hoặc các hoạt động read/write có cường độ cao, dẫn tới hiệu năng trở thành `key storage metric`. Docker chọn 1 kiến trúc `layered storage` cho các image và container. Một layered file system được tạo bởi nhiều các layer riêng rẽ cho phép các image được cấu trúc và tái cấu trúc theo nhu cầu thay vì việc tạo một image lớn và nguyên khối.
 
 Các layered filesystem được hỗ trợ là : 
-	- devie mapper
+
+	- device mapper
 	- btrfs
 	- aufs
 	- overlay
