@@ -88,7 +88,7 @@ d1b55fd07600        14 months ago       /bin/sh -c #(nop) CMD ["/bin/bash"]     
 ```
 
 Chú ý rằng image ubuntu đã thay đổi không có các bản copy của chỉnh nó của mỗi layer. Image mới sẽ chia sẻ các layer bên dưới với những image trước đã như ví dụ sau : 
-![Docker](/ManhDV/Docker/saving-space.jpg)
+![Docker](/ManhDV/Docker/images/saving-space.jpg)
 
 Tất cả các container khởi động với image mơí nhất sẽ share các layer với tất cả container từ image đầu tiên. Điều này sẽ tối ưu cả không gian sử dụng image và hiệu năng hệ thống.
 
