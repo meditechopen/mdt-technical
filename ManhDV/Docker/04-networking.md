@@ -220,7 +220,7 @@ Docker cho phép tạo các user define network để cô lập các container. 
 
 Ảnh sau thể hiện mô hình của Docker multiple networking :
 
-![Docker](/ManhDv/Docker/images/cnm-model.jpg)
+![Docker](/ManhDV/Docker/images/cnm-model.jpg)
 
 Tạo 1 custom bridge network :
 ```sh
