@@ -97,8 +97,9 @@ Tất cả các container khởi động với image mơí nhất sẽ share cá
 Các container thường yêu cầu dữ liệu phải được lưu trữ lâu dài và liên tục, vượt lên trên vòng đời của container, ưu cầu phải dùng tới việc lưu trữ bằng persistent volume. Thực tế cho thấy, dữ liệu nên được cô lập với container. VD như việc quản lý dữ liệu nên được tách rời từ vòng đời của container.
 
 Việc lưu trữ dữ liệu lâu dài (persistent volume) là 1 use case quan trọng, đặc biệt là với database, image, file và folder chia sẻ giữa các container. Để làm được việc này thông thường có 2 cách tiếp cận :
-	- 1. host based volumes
-	- 2. shared volumes
+
+ - 1. host based volumes
+ - 2. shared volumes
 
 Trong trường hợp đầu, persistent volume tồn tại trên cùng host nơi container đang chạy. Trong trường hợp sau, volumes tồn tại trên 1 shared filesystem như NFS, GlusterFS... Trong TH đầu tiên, dữ liệu được lưu trữ lâu dài trên host, có nghĩa rằng nếu container bị di chuyển tới host khác, nội dung của volume không còn ở trên container mới. Trong TH2, miễn là mount point được truy cập từ mọi node thì volume có thể được mount tới bất kỳ container nào. TH2 cung cấp dữ liệu thông qua một cluster của các host.
 
