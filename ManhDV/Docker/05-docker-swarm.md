@@ -1,6 +1,7 @@
 ## Docker Swarm
 
 Swarm node cung cấp cấp giải pháp all-built-in Docker cluster bao gồm orchestrator của các contaienr và network cho multi host. Mục tiêu của Docker Swarm là : 
+
  - 1. High avaibility
  - 2. Scaling
  - 3. Load balancing
