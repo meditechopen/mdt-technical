@@ -554,6 +554,7 @@ Prot LocalAddress:Port Scheduler Flags
   -> RemoteAddress:Port           Forward Weight ActiveConn InActConn
 FWM  263 rr
   -> 10.255.0.7:0                 Masq    1      0          0
+  -> 10.255.0.7:0                 Masq    1      0          0
 ```
 
 Cấu hình trên sẽ báo IPVS load balancer để forward request tới IP `10.255.0.7`, là IP của nodejs container trên các workder node khác. Đó chỉ là backend server cho internal load balancer. Các request tới backend thông qua overlay network.
@@ -610,7 +611,7 @@ Các client request được kiểm soát bởi IPVS theo kiểu round-robin.
 
 Layout như sau : 
 
-![/ManhDV/Docker/images/swarm-layout-02.png]
+![docker](/ManhDV/Docker/images/swarm-layout-02.png)
 
 ### 5. Routing Mesh
 Tất cả các node tham gia 1 swarm, đều có thể định tuyến các incoming request từ ingress sandbox của nó tới service cụ thể, không cần biết là service đó đang chạy trên node nào. Tính năng này được gọi là **Rouing Mesh** và được dùng để expose 1 service ra mạng bên ngoài. VD, 1 request được expose tới nodejs service `curl http://swarm00:80` hoặc `curl http://swarm02:80` sẽ được kiểm soát bởi IPVS trên các node `swarm00` và `swarm02` tương ứng. 
