@@ -537,7 +537,7 @@ docker network inspect docker_gwbridge
 
 Network layout sẽ dạng như sau : 
 
-![/ManhDV/Docker/images/swarm-layout-01.png]
+![docker](/ManhDV/Docker/images/swarm-layout-01.png)
 
 Có thể thấy gateway bridge network được coi là ingress point cho tất cả các request tới nodejs service được expose `curl http://swarm01:80`. Các request này được kiểm soát bởi ingress sandbox trên mỗi node và sau đó được gửi tới nodejs container thông qua overlay network. Tất cả quy trình được thiết lập bởi iptables chain.
 
