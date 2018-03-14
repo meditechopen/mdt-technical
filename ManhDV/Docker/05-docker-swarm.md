@@ -639,7 +639,7 @@ curl 10.10.10.62:80
 Hello World! from 10.255.0.7
 ```
 
-Chú ý rằng **routing mesh** là lựa chọn mặc định. Nếu bạn cần service được expose chỉ trên node thật mà service đang chạy, bạn có thể force chúng với option `--publish mode=host,target=<target_port>,published=<published_port>``` trong quá trình tạo service.
+Chú ý rằng **routing mesh** là lựa chọn mặc định. Nếu bạn cần service được expose chỉ trên node thật mà service đang chạy, bạn có thể force chúng với option `--publish mode=host,target=<target_port>,published=<published_port>` trong quá trình tạo service.
 Ví dụ : 
 ```sh
 docker service create  \
