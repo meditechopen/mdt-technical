@@ -17,7 +17,7 @@ Các stack file định nghĩa các biến môi trường, các deployment tag, 
 
 Ví dụ sau là 1 ứng dụng 2 lớp của 1 web app đang chạy và 1 mysql database là backend. 2 service được liên kết với nhau qua internal overlay network.
 
-Sau đây là file `vote-stack,yaml` định nghĩa stack :
+Sau đây là file `vote-stack.yaml` định nghĩa stack :
 ```sh
 version: "3"
 services:
@@ -318,7 +318,7 @@ Swarm cluster sử dụng secret để quản lý các dữ liệu nhạy cảm 
  - TLS certificates và keys
  - SSH keys
  - Database names
- - Generic data up to 500 GB
+ - Generic data up to 500 KB
  
 **Chú ý** : các secret chỉ khả dụng với các dịch vụ swarm, không khả dụng với các container chạy standalone.
 
@@ -493,3 +493,155 @@ rm -rf db_root_password.txt
 ```
 
 Bạn phải update stack file lên bản 3.1 để có thể hỗ trợ secret. Việc update stack file có thể tìm tại [đây](http://tutorial.docker.noverit.com/examples/vote-stack-secrets.yaml)
+
+### 9. User Namespace 
+Trong Linux. các namespace là rất cần thiết cho hoạt động của các container. User namepsace là kỹ thuật để map các UID và GID bên trong 1 container tới các user và group bên trong host.
+
+#### 9.1. Container root user
+VD, namespace PID dùng để các process trên 1 container tương tác với các process trên 1 container khác trong 1 host. 1 process có thể có `PID=1` bên trong 1 container.
+
+```sh
+[root@centos ~]# docker run -it --rm ubuntu:latest /bin/bash
+root@f1ad1406edd4:/# ps -ef
+UID        PID  PPID  C STIME TTY          TIME CMD
+root         1     0  0 12:47 ?        00:00:00 /bin/bash
+root        11     1  0 12:51 ?        00:00:00 ps -ef
+```
+
+Process sẽ cps PID gốc trên host :
+```sh
+[root@centos ~]# ps -ef | grep bash
+UID        PID  PPID  C STIME TTY          TIME CMD
+...
+root     23316 23305  0 14:47 pts/3    00:00:00 /bin/bash
+root     23354 12429  0 14:53 pts/2    00:00:00 grep --color=auto bash
+```
+
+PID namespace chịu trách nhiệm cho việc remapping PID bên trong container. Tuy nhiên, chúng ta có thể thể root user trên trong container được map tới root user. Thậm chí root user của container không thể tùy ý đi tới host, đây là 1 lỗ hổng an ninh.
+
+Một cách để tránh lỗi này là chạy các process bên trong container với no-root user. Điều này được thực hiện bởi chỉ dẫn `USER` bên trong Dockerfile. VD tạo 1 container chạy ứng dụng python với non-root user :
+```sh
+FROM centos:latest
+RUN yum update -y && yum install -y sudo && yum clean all
+RUN groupadd -r kalise -g 1969 && \
+    useradd -u 1969 -r -g kalise -m -d /app -s /sbin/nologin kalise && \
+    chmod 755 /app
+RUN echo "kalise ALL=(root) NOPASSWD:ALL" > /etc/sudoers.d/kalise && \
+    chmod 0440 /etc/sudoers.d/kalise
+WORKDIR /app
+USER kalise
+CMD ["python", "-m", "SimpleHTTPServer"]
+```
+
+Container được start với ứng dụng `SimpleHTTPServer` cùng với `kalise` user có UID=1969 và GID=1969
+
+Complie image và start 1 container
+```sh
+docker build -t httpd:latest ./Dockerfile
+docker run --rm --name simple httpd:latest
+```
+
+Trên host machine :
+```sh
+[root@centos ~]# ps -ef | grep python
+UID        PID  PPID  C STIME TTY          TIME CMD
+1969     28563 28550  0 16:09 ?        00:00:00 python -m SimpleHTTPServer
+root     28585 12429  0 16:10 pts/2    00:00:00 grep --color=auto python
+```
+
+Bên trong container :
+```sh
+[root@centos ~]# docker exec -it simple /bin/bash
+[kalise@270009b0d141 ~]$ ps -ef
+UID        PID  PPID  C STIME TTY          TIME CMD
+kalise       1     0  0 14:09 ?        00:00:00 python -m SimpleHTTPServer
+kalise       5     0  0 14:12 ?        00:00:00 /bin/bash
+kalise      20     5  0 14:12 ?        00:00:00 ps -ef
+[kalise@270009b0d141 ~]$
+```
+
+Điều này ngăn user kalise nhận các quyền hạn tới host. Tuy nhiên, với các container mà các process phải chạy với root user bên trong container, chúng ta có thể re-map user này tới một less-privileged user trên host. User được map sẽ được gắn 1 dải của UID với chức năng bên trong container như là 1 normal user nhưng không có đặc quyền gì trên host.
+
+#### 9.2. Cấu hình user namespace
+Để sử dụng user namespace, nó nên được cấu hình và mở trên Docker engine. Nó có ảnh hưởng tới tất cả các container trên host machine, tuy nhiên nó có thể disable một cách bắt buộc trên mỗi container.
+
+Stop docker daemon  và chỉnh  sửa file cấu hình `/etc/docker/daemon.json` như sau : 
+```sh
+{
+ "debug": true,
+ "userns-remap": "dummy"
+}
+```
+
+với `dummy` user trên host mà root user trên container sẽ được ánh xạ tới.
+
+Trước khi restart engine, chúng ta có thể setup host cho việc sử dụng user namespace. Trên các máy Centos, kiểm tra kernel verison đang chạy, enable user namespace, và restart machine :
+```sh
+kernel=$(uname -r)
+grubby --args="user_namespace.enable=1" --update-kernel=/boot/vmlinuz-$kernel
+init 6
+```
+
+Trên host, cấu hình dummy user :
+```sh
+adduser -r -s /bin/nologin dummy
+```
+
+Chúng ta cũng cần có các khoảng UID và GID bên dưới được định nghĩa trong `/etc/subuid` và `/etc/subgid` file :
+```sh
+echo dummy:100000:65536 > /etc/subuid
+echo dummy:100000:65536 > /etc/subgid
+```
+
+Ở vd trên, 100000 đại diện cho UID đầu tiên trên khoảng UID khả dụng mà các process bên trọng container có thể chạy; `65536` đại diện cho số lớn nhất của UID mà có thể sử dụng bởi 1 container. Nếu 1 process bên trong container chạy với `UID=1`, trên host nó sẽ chạy với `UID=100000`.
+
+Restart docker engine. Chú ý : khi enable user namespace, docker engine giấu tất cả các object đứng trước như : container, image, volume, network... Điều này là bởi vì engine phụ trách việc ánh xụ hoạt động trên 1 môi trường mới. Tất cả mọi thứ ánh xạ sẽ nhận thư mục riêng `/var/lib/docker/xxx.yyy`, format`xxx` là UID phụ thuộc và `yyy` là GID phụ thuộc.
+
+Hãy xem remapped engine hoạt động.
+
+Tạo 1 container mới :
+```sh
+[root@centos ~]# docker run -it --rm ubuntu:latest /bin/bash
+root@33ba8fc8c4f5:/# ps -ef
+UID        PID  PPID  C STIME TTY          TIME CMD
+root         1     0  0 16:18 ?        00:00:00 /bin/bash
+root         9     1  0 16:19 ?        00:00:00 ps -ef
+root@33ba8fc8c4f5:/#
+```
+
+Trên host :
+```sh
+[root@centos]# ps -ef | grep bash
+...
+UID        PID  PPID  C STIME TTY          TIME CMD
+100000    2978  2966  0 18:18 pts/3    00:00:00 /bin/bash
+root      3012  2527  0 18:23 pts/1    00:00:00 grep --color=auto bash
+```
+
+Có thể thấy process với `UID=1` trên container đang chạy với root nhưng process được map với dummy user trên host với `UID=100000`
+
+User namespace có thể bị disable một cách tùy chọn trên mỗi container bằng việc start container đơn với `--userns-host` option :
+```sh
+    [root@centos ~]# docker run -it --rm --userns=host ubuntu:latest /bin/bash
+    
+    root@99ed855c0383:/# top &
+    [1] 11
+    
+    root@99ed855c0383:/# ps -ef
+    UID        PID  PPID  C STIME TTY          TIME CMD
+    root         1     0  0 16:30 ?        00:00:00 /bin/bash
+    root        11     1  0 16:32 ?        00:00:00 top
+    root        13     1  0 16:32 ?        00:00:00 ps -ef
+```
+
+Trên host :
+```sh
+    [root@centos ~]# ps -ef | grep top
+    UID        PID  PPID  C STIME TTY          TIME CMD
+    ...
+    root      3247  3218  0 18:32 pts/4    00:00:00 top
+    root      3252  2572  0 18:33 pts/2    00:00:00 grep --color=auto top
+```
+
+Có thể thấy user root trên container được map tới user root.
+Để disable tính năng, stop engine, remove `"userns-remap": "dummy"` từ /etc/docker/daemon.json file và restart  engine.
