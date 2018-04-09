@@ -695,8 +695,8 @@ Chú ý :
 Không bao gồm các master node chuyên dụng của Elasticsearch trong thuộc tính host, nếu không nó sẽ gửi dữ liệu đầu vào tới master node
 
 Các giá trị của các setting :
-|------|----------|-------------|
 |Setting |Value type |Default value|
+|------|----------|-------------|
 |action |String |''index''|
 |cacert |Filesystem path |No default value|
 |codec |Codec |''plain''|
