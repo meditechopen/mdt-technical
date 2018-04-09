@@ -517,8 +517,8 @@ Các cấu hình thiết lập thêm vào như sau :
 Các value type và default value cho các cấu hình như sau :
 
 
-|Setting|Value|Default value|
-|---------|----|----|
+|Setting|Value type|Default value|
+|-------|----------|-------------|
 |add_field |Hash |{}|
 |close_older |Number |3600|
 |codec |Codec |"plain"|
@@ -635,8 +635,8 @@ Trong plugin này thì không setting nào là bắt buộc. Các cấu hình th
 
 Giá trị theo bảng sau :
 
-|Setting |Value type| Default |value|
-|------|----------|-------------|
+|Setting |Value type| Default value|
+|--------|----------|--------------|
 |add_field |Hash |{}|
 |add_tag |Array |[]|
 |break_on_match |Boolean |true|
@@ -696,7 +696,7 @@ Không bao gồm các master node chuyên dụng của Elasticsearch trong thu�
 
 Các giá trị của các setting :
 |Setting |Value type |Default value|
-|------|----------|-------------|
+|--------|-----------|-------------|
 |action |String |''index''|
 |cacert |Filesystem path |No default value|
 |codec |Codec |''plain''|
