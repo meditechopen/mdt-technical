@@ -1,6 +1,6 @@
 ## Tìm hiểu ELK
 
-###1. ELK stack case study
+### 1. ELK stack case study
 
 #### 1.1 Saleforce (cty cung cấp Customer Relationship Management platform)
 Saleforce phát triển 1 plugin mới tên ELF (Event log files) để thu thập Saleforce logged data, cho phép theo dõi các hoạt động người dùng. Mục tiêu phân tích data là để hiểu hành vi và xu hướng người dùng trên Saleforce.
@@ -270,7 +270,7 @@ Security. alert, monitoring được thể hiện dưới 3 cái tên : Shield, 
  
 #### 4.2. Kiến trúc của Elasticsearch
 
-![elk](/ManhDV/ELK/images/elk-02/png)
+![elk](/ManhDV/ELK/images/elk-02.png)
 
 **Index** chứa một hoặc nhiều **type**. Một type có thể hình dung như là một table đối với database. Một type có thể có một hoặc nhiều **documents**. Một document có thể có một hoặc nhiều **field**. Field là cặp key value.
 
@@ -333,7 +333,7 @@ Logstash thực hiện **Extract**, **Transform**, và **Load** (ETL)
 
 Logstash pipeline bao gồm input, filter và output plugin. Tuy nhiên trong mô hình thông thường, Logstash chỉ nhận data input mà không tiến hành chỉnh sửa dữ liệu, model thông thường như sau :
 
-![elk](/ManhDV/ELK/images/elk-03/png)
+![elk](/ManhDV/ELK/images/elk-03.png)
  
 #### 5.3. Cấu trúc file cấu hình logstash
 
@@ -448,6 +448,7 @@ String chứa một giá trị có thể được chứa trong dấu '' hoặc "
 name => "aaagw"
 escape => "value"eu"
 single => 'Hello It's nice to see you'
+```
 
 #### 5.3.2. Sử dụng Conditional
 
@@ -515,8 +516,9 @@ Các cấu hình thiết lập thêm vào như sau :
  
 Các value type và default value cho các cấu hình như sau :
 
-|---------|----|----|
+
 |Setting|Value|Default value|
+|---------|----|----|
 |add_field |Hash |{}|
 |close_older |Number |3600|
 |codec |Codec |"plain"|
@@ -632,8 +634,9 @@ Trong plugin này thì không setting nào là bắt buộc. Các cấu hình th
 	- timeout_millis : Dùng để xóa regex nếu nó nhận time được chỉ định trong cài đặt này. Nó tương ứng với mỗi pattern nếu có nhiều pattern cho grok. Được tính theo milli s
 
 Giá trị theo bảng sau :
-|------|----------|-------------|
+
 |Setting |Value type| Default |value|
+|------|----------|-------------|
 |add_field |Hash |{}|
 |add_tag |Array |[]|
 |break_on_match |Boolean |true|
