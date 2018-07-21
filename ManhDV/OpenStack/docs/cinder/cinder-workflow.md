@@ -3,6 +3,8 @@
  *	[1 Thành phần Cinder](#1)
  *	[2 Workflow của Cinder khi tạo mới volume](#2)
  *	[3 Workflow của Cinder khi Attach Volume](#3)
+ *	[4 Workflow của Cinder khi Backup Volume](#4)
+ *	[5 Workflow của Cinder khi Restore Volume](#5)
 
 # 1 Thành phần Cinder <a name="1"> </a>
 
@@ -48,3 +50,31 @@ Hình bên trên mô tả quy trình tạo Volume , tiếp theo chúng ta cùng 
 7. Cinder-api thực hiện quá trình đọc message phản hồi từ cinder-volume từ hàng đợi; Truyền thông tin kết nối đến RESTful phản hồi gọi tới NOVA.
 8. Nova tạo ra kết nối với bộ lưu trữ thông tin được trả về Cinder.
 9. Nova truyền volume device/file tới hypervisor , sau đó gắn volume device/file vào máy ảo client như một block device thực thế hoặc ảo hóa (phụ thuộc vào giao thức lưu trữ).
+
+## 4 Workflow của Cinder khi Backup Volume <a name="4"> </a>
+
+![cinder](/ManhDV/OpenStack/images/cinder_backup_process.png)
+
+1. Client gửi request backup một Client volume với REST API (clint có thể dùng `python-cinderclient` CLI )
+2. `cinder-api` process xác thực yêu cầu, thông tin người dùng, và khi thông tin được xác thực, message sẽ được đẩy tới backup manager thông qua AMQP.
+3. `cinder-backup` đọc message từ queue, tạo 1 database record cho việc backup và chuyển thông tin từ database cho volume cần bckup
+4. `cinder-backup` gọi phương thức `backup-volume` của Cinder volume driver tương ứng với volume cần được backup, đưa bản tin backup và tạo kết nối cho backup service để dùng (NFS, Switf, Ceph...)
+5. Cinder voume driver phù hợp được gắn với Cinder volume
+6. Volume driver gọi phương thức `backup` cho service backup đã được cấu hình, bàn giao volume attachment
+7. Backup service chuyển data và metadata của Cinder volume và meta tới backup repository
+8. Backup service update database với một record hoàn chỉnh cho backup này và thông báo thông tin phản hồi tới `cinder-api` process thông qua AQMP
+9. `cinder-api` process đọc message phản hồi từ queue và cho qua các kết quả trên RESTful response tới client
+
+## 5 Workflow của Cinder khi Restore Volume <a name="5"> </a>
+
+![cinder](/ManhDV/OpenStack/images/cinder_backup_process_2.png)
+
+1. Client gửi request restore một Client volume với REST API (clint có thể dùng `python-cinderclient` CLI )
+2. `cinder-api` process xác thực yêu cầu, thông tin người dùng, và khi thông tin được xác thực, message sẽ được đẩy tới backup manager thông qua AMQP.
+3. `cinder-backup` đọc message từ queue, tìm trong database record cho việc backup và một record database volume mới hoặc đã có sẵn trước đó, tùy thuộc và volume có trước đó có được yêu cầu hay không. 
+4. `cinder-backup` gọi phương thức `backup-resore` của Cinder volume driver tương ứng với volume cần được backup, đưa bản tin backup và tạo kết nối cho backup service để dùng (NFS, Switf, Ceph...)
+5. Cinder voume driver phù hợp được gắn với Cinder volume
+6. Volume driver gọi phương thức `restore` cho service backup đã được cấu hình, bàn giao volume attachment
+7. Backup service xác định metadata và data backup cho Cinder volume trong backup repo và sử dụng chúng để restore Cinder volume đích tới trạng thái của volume gốc.
+8. Backup service thông báo thông tin phản hồi tới `cinder-api` process thông qua AQMP
+9. `cinder-api` proces đọc message phải hồi từ `cinder-backup` từ queue và thông báo kết quả trên RESTful response tới client.
